@@ -1,0 +1,8 @@
+README.txt
+pyDes.py
+setup.cfg
+setup.py
+pyDes.egg-info/PKG-INFO
+pyDes.egg-info/SOURCES.txt
+pyDes.egg-info/dependency_links.txt
+pyDes.egg-info/top_level.txt
