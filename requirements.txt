@@ -1,1 +1,6 @@
 pyDes==2.0.1
+aliyun-python-sdk-core==2.13.20
+aliyun-python-sdk-core-v3==2.13.11
+aliyun-python-sdk-kms==2.10.1
+oss2==2.12.1
+urllib3==1.25.8

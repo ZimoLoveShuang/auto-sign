@@ -1,6 +1,29 @@
 # auto-sign
 
-受人之托，写的今日校园自动签到脚本，适用于西南大学，长江师范学院
+受人之托，写的今日校园自动签到脚本，目前适用于下表：
+
+<table>
+    <tr>
+        <th>学校名称</th>
+        <th>学校英文简称</th>
+        <th>加入今日校园的方式</th>
+    </tr>
+    <tr>
+        <td>西南大学</td>
+        <td>swu</td>
+        <td>NOTCLOUD</td>
+    </tr>
+    <tr>
+        <td>长江师范学院</td>
+        <td>yznu</td>
+        <td>NOTCLOUD</td>
+    </tr>
+    <tr>
+        <td>安阳工学院</td>
+        <td>ayit</td>
+        <td>CLOUD</td>
+    </tr>
+</table>
 
 # 设计思路
 
@@ -24,6 +47,8 @@
     0 10 7,19 * * * *
     ```
 7. enjoy it!!!
+
+#### 如遇到依赖问题，请去[`auto-sumit`](https://github.com/ZimoLoveShuang/auto-submit)项目下载`dependency.zip`，然后参考`auto-submit`项目的说明将函数依赖层添加到腾讯云函数
 
 # 注意
 
