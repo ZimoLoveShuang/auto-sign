@@ -131,11 +131,11 @@ def login():
     log(session.cookies)
 
     # 4.获取MOD_AUTH_CAS
-    url = 'https://fzu.cpdaily.com/wec-counselor-sign-apps/stu/mobile/index.html?timestamp=' + str(
+    url = 'https://{host}/wec-counselor-sign-apps/stu/mobile/index.html?timestamp='.format(host=host) + str(
         int(round(time.time() * 1000)))
     # 更新headers
     headers = {
-        'Host': 'fzu.cpdaily.com',
+        'Host': host,
         'Connection': 'keep-alive',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 cpdaily/8.0.8 wisedu/8.0.8',

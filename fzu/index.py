@@ -51,7 +51,7 @@ def getUnSignedTasks():
         'Host': host,
         'Connection': 'keep-alive',
         'Accept': 'application/json, text/plain, */*',
-        'Origin': 'https://fzu.cpdaily.com',
+        'Origin': 'https://' + host,
         'X-Requested-With': 'XMLHttpRequest',
         'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 cpdaily/8.0.8 wisedu/8.0.8',
         'Content-Type': 'application/json',
