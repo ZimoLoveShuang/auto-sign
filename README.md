@@ -1,6 +1,6 @@
 # auto-sign
 
-受人之托，写的今日校园自动签到脚本，支持图片，定位，额外选项等，基本上应该算是通用吧，目前适用于下表：
+受人之托，写的今日校园自动签到脚本，支持图片，定位，额外选项等，**可能已经通用了在今日校园签到的所有学校了**，目前测试通过的学校如下表：
 
 <table>
     <tr>
@@ -33,6 +33,12 @@
         <td>CLOUD</td>
         <td>定位+照片</td>
     </tr>
+    <tr>
+        <td>福州大学</td>
+        <td>fzu</td>
+        <td>NOTCLOUD</td>
+        <td>定位+两个额外选项</td>
+    </tr>
 </table>
 
 # 设计思路
@@ -40,9 +46,12 @@
 1. 模拟登陆
 2. 获取每日未签到任务
 3. 获取未签到任务详情
-4. 提交未签到任务
+4. 根据配置，自动填写表单
+5. 提交未签到任务
 
 # 使用
+
+## 非福州大学的学子
 
 1. 下载或者克隆此仓库到本地
     ```shell script
@@ -66,6 +75,18 @@
 #### 如果你不会配置表单组默认选项配置，请先配置好user信息之后本地执行generate.py然后将分割线下的内容复制到配置文件中对应位置
 
 #### 如遇到依赖问题，请去[`auto-sumit`](https://github.com/ZimoLoveShuang/auto-submit)项目下载`dependency.zip`，然后参考`auto-submit`项目的说明将函数依赖层添加到腾讯云函数
+
+#### 如果不知道怎么配置经纬度信息，可以访问[这里](http://zuobiao.ay800.com/s/27/index.php)，将经纬度四舍五入保留六位小数之后的放入配置文件对应位置即可
+
+
+## 福州大学的学子
+
+1. 下载或者克隆此仓库到本地
+    ```shell script
+    git clone https://github.com/ZimoLoveShuang/auto-sign.git
+    ```
+2. 进入fzu文件夹，先配置好`config.yml`，然后执行`login.py`将得到的`CpdailyInfo`和`Cookies`填写到`fzu/index.py`文件的对应位置
+3. 配置腾讯云函数，步骤参考上面
 
 # 注意
 
