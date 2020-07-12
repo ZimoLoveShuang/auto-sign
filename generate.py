@@ -13,13 +13,13 @@ def generate():
     task = app.getDetailTask(session, params, apis)
     extraFields = task['extraField']
     if len(extraFields) < 1:
-        app.log('没有附加选项需要填写')
+        app.log('没有附加问题需要填写')
         exit(-1)
     defaults = []
     for i in range(0, len(extraFields)):
         extraField = extraFields[i]
         extraFieldItems = extraField['extraFieldItems']
-        print('额外选项%d ' % (i + 1) + extraField['title'])
+        print('额外问题%d ' % (i + 1) + extraField['title'])
         default = {}
         one = {}
         for j in range(0, len(extraFieldItems)):

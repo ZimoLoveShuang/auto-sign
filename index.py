@@ -20,7 +20,7 @@ def getYmlConfig(yaml_file='config.yml'):
 
 
 # 全局配置
-config = getYmlConfig()
+config = getYmlConfig(yaml_file='config_swu.yml')
 
 
 # 获取当前utc时间，并格式化为北京时间
