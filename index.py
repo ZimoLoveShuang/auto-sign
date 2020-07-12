@@ -265,7 +265,7 @@ def submitForm(session, user, form, apis):
         log('自动签到成功')
         sendMessage('自动签到成功', user['email'])
     else:
-        log('自动签到是吧，原因是：' + message)
+        log('自动签到失败，原因是：' + message)
         sendMessage('自动签到失败，原因是：' + message, user['email'])
 
 
