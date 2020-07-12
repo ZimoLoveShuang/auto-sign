@@ -20,7 +20,7 @@ def getYmlConfig(yaml_file='config.yml'):
 
 
 # 全局配置
-config = getYmlConfig(yaml_file='config_swu.yml')
+config = getYmlConfig(yaml_file='config.yml')
 
 
 # 获取当前utc时间，并格式化为北京时间
@@ -129,7 +129,7 @@ def getUnSignedTasks(session, apis):
     if len(res.json()['datas']['unSignedTasks']) < 1:
         log('当前没有未签到任务')
         exit(-1)
-    log(res.json())
+    # log(res.json())
     latestTask = res.json()['datas']['unSignedTasks'][0]
     return {
         'signInstanceWid': latestTask['signInstanceWid'],
@@ -262,8 +262,10 @@ def submitForm(session, user, form, apis):
                        headers=headers, data=json.dumps(form))
     message = res.json()['message']
     if message == 'SUCCESS':
+        log('自动签到成功')
         sendMessage('自动签到成功', user['email'])
     else:
+        log('自动签到是吧，原因是：' + message)
         sendMessage('自动签到失败，原因是：' + message, user['email'])
 
 
