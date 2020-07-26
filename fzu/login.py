@@ -1,3 +1,4 @@
+# 由于接口更新了验证，暂时获取不到MOD_AUTH_CAS，这也就意味着login.py脚本失效
 import sys
 import requests
 import json

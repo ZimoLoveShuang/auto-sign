@@ -51,6 +51,8 @@
 
 # 使用
 
+## 可以参考[auto-submit项目](https://github.com/ZimoLoveShuang/auto-submit)
+
 ## 非福州大学的学子
 
 1. 下载或者克隆此仓库到本地
@@ -81,12 +83,7 @@
 
 ## 福州大学的学子
 
-1. 下载或者克隆此仓库到本地
-    ```shell script
-    git clone https://github.com/ZimoLoveShuang/auto-sign.git
-    ```
-2. 进入fzu文件夹，先配置好`config.yml`，然后执行`login.py`将得到的`CpdailyInfo`和`Cookies`填写到`fzu/index.py`文件的对应位置
-3. 配置腾讯云函数，步骤参考上面
+1. 参考[auto-submit项目](https://github.com/ZimoLoveShuang/auto-submit)的说明
 
 # 注意
 
