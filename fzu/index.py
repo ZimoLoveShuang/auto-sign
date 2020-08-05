@@ -2,7 +2,7 @@ import requests
 import sys
 import json
 import yaml
-import time
+from fzu import login
 from datetime import datetime, timedelta, timezone
 
 ############配置############
@@ -11,6 +11,7 @@ Cookies = {
     'MOD_AUTH_CAS': '',
 }
 CpdailyInfo = ''
+sessionToken = ''
 ############配置############
 
 # 全局
@@ -146,6 +147,7 @@ def submitForm(form):
         log('自动签到失败，原因是：' + message)
         sendMessage('自动签到失败，原因是：' + message, user['email'])
 
+
 # 发送邮件通知
 def sendMessage(msg, email):
     send = email
@@ -161,33 +163,17 @@ def sendMessage(msg, email):
             log(res.json())
 
 
-# 更新MOD_AUTH_CAS
-def MOD_AUTH_CAS():
-    url = 'https://{host}/wec-counselor-sign-apps/stu/mobile/index.html?timestamp='.format(host=host) + str(
-        int(round(time.time() * 1000)))
-    # 更新headers
-    headers = {
-        'Host': host,
-        'Connection': 'keep-alive',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 cpdaily/8.0.8 wisedu/8.0.8',
-        'Accept-Encoding': 'gzip,deflate',
-        'Accept-Language': 'zh-CN,en-US;q=0.8',
-        'X-Requested-With': 'com.wisedu.cpdaily',
-    }
-
-    session.get(url=url, headers=headers)
-    log(requests.utils.dict_from_cookiejar(session.cookies))
-
-
 def main():
-    MOD_AUTH_CAS()
+    data = {
+        'sessionToken': sessionToken
+    }
+    login.getModAuthCas(data)
     params = getUnSignedTasks()
     # log(params)
     task = getDetailTask(params)
     # log(task)
     form = fillForm(task)
-    log(form)
+    # log(form)
     submitForm(form)
 
 
@@ -197,9 +183,8 @@ def main_handler(event, context):
         main()
         return 'success'
     except:
-        sendMessage('自动签到失败，原因是：系统出现错误，可能是Cookies过期了', user['email'])
         return 'fail'
 
 
 if __name__ == '__main__':
-    main_handler({}, {})
+    print(main_handler({}, {}))
