@@ -251,6 +251,7 @@ def login():
     getModAuthCas(data)
     print('==============sessionToken填写到index.py==============')
     sessionToken = data['sessionToken']
+    print(sessionToken)
     print('==============CpdailyInfo填写到index.py==============')
     print(CpdailyInfo)
     print('==============Cookies填写到index.py==============')
