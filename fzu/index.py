@@ -2,7 +2,7 @@ import requests
 import sys
 import json
 import yaml
-from fzu import login
+import login
 from datetime import datetime, timedelta, timezone
 
 ############配置############
