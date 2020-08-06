@@ -121,6 +121,7 @@ def fillForm(task):
     form['isMalposition'] = task['isMalposition']
     form['abnormalReason'] = user['abnormalReason']
     form['position'] = user['address']
+    # print(form)
     return form
 
 
@@ -145,7 +146,8 @@ def submitForm(form):
         sendMessage('自动签到成功', user['email'])
     else:
         log('自动签到失败，原因是：' + message)
-        sendMessage('自动签到失败，原因是：' + message, user['email'])
+        exit(-1)
+        # sendMessage('自动签到失败，原因是：' + message, user['email'])
 
 
 # 发送邮件通知

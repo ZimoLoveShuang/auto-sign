@@ -271,7 +271,8 @@ def submitForm(session, user, form, apis):
         sendMessage('自动签到成功', user['email'])
     else:
         log('自动签到失败，原因是：' + message)
-        sendMessage('自动签到失败，原因是：' + message, user['email'])
+        # sendMessage('自动签到失败，原因是：' + message, user['email'])
+        exit(-1)
 
 
 # 发送邮件通知
@@ -312,4 +313,4 @@ def main_handler(event, context):
 
 if __name__ == '__main__':
     # print(extension)
-    main()
+    print(main_handler({},{}))
