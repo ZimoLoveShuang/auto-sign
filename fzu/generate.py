@@ -1,4 +1,5 @@
-from fzu import index as app
+# -*- coding: utf-8 -*-
+import index as app
 import yaml
 
 
