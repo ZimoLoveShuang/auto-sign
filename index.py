@@ -1,14 +1,20 @@
 # -*- coding: utf-8 -*-
 import sys
-import requests
 import json
 import uuid
+import oss2
+import yaml
 import base64
+import requests
 from pyDes import des, CBC, PAD_PKCS5
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlparse
-import oss2
-import yaml
+from urllib3.exceptions import InsecureRequestWarning
+
+# debug模式
+debug = False
+if debug:
+    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 # 读取yml配置
@@ -100,7 +106,7 @@ def getSession(user, apis):
 
     cookies = {}
     # 借助上一个项目开放出来的登陆API，模拟登陆
-    res = requests.post(url=config['login']['api'], data=params)
+    res = requests.post(url=config['login']['api'], data=params, verify=not debug)
     # cookieStr可以使用手动抓包获取到的cookie，有效期暂时未知，请自己测试
     cookieStr = str(res.json()['cookies'])
     log(cookieStr)
@@ -131,11 +137,11 @@ def getUnSignedTasks(session, apis):
     # 第一次请求每日签到任务接口，主要是为了获取MOD_AUTH_CAS
     res = session.post(
         url='https://{host}/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay'.format(host=apis['host']),
-        headers=headers, data=json.dumps({}))
+        headers=headers, data=json.dumps({}), verify=not debug)
     # 第二次请求每日签到任务接口，拿到具体的签到任务
     res = session.post(
         url='https://{host}/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay'.format(host=apis['host']),
-        headers=headers, data=json.dumps({}))
+        headers=headers, data=json.dumps({}), verify=not debug)
     if len(res.json()['datas']['unSignedTasks']) < 1:
         log('当前没有未签到任务')
         exit(-1)
@@ -159,7 +165,7 @@ def getDetailTask(session, params, apis):
     }
     res = session.post(
         url='https://{host}/wec-counselor-sign-apps/stu/sign/detailSignInstance'.format(host=apis['host']),
-        headers=headers, data=json.dumps(params))
+        headers=headers, data=json.dumps(params), verify=not debug)
     data = res.json()['datas']
     return data
 
@@ -205,7 +211,7 @@ def fillForm(task, session, user, apis):
 # 上传图片到阿里云oss
 def uploadPicture(session, image, apis):
     url = 'https://{host}/wec-counselor-sign-apps/stu/sign/getStsAccess'.format(host=apis['host'])
-    res = session.post(url=url, headers={'content-type': 'application/json'}, data=json.dumps({}))
+    res = session.post(url=url, headers={'content-type': 'application/json'}, data=json.dumps({}), verify=not debug)
     datas = res.json().get('datas')
     fileName = datas.get('fileName')
     accessKeyId = datas.get('accessKeyId')
@@ -228,7 +234,7 @@ def getPictureUrl(session, fileName, apis):
     data = {
         'ossKey': fileName
     }
-    res = session.post(url=url, headers={'content-type': 'application/json'}, data=json.dumps(data), verify=False)
+    res = session.post(url=url, headers={'content-type': 'application/json'}, data=json.dumps(data), verify=not debug)
     photoUrl = res.json().get('datas')
     return photoUrl
 
@@ -269,7 +275,7 @@ def submitForm(session, user, form, apis):
         'Connection': 'Keep-Alive'
     }
     res = session.post(url='https://{host}/wec-counselor-sign-apps/stu/sign/submitSign'.format(host=apis['host']),
-                       headers=headers, data=json.dumps(form))
+                       headers=headers, data=json.dumps(form), verify=not debug)
     message = res.json()['message']
     if message == 'SUCCESS':
         log('自动签到成功')
@@ -286,7 +292,7 @@ def sendMessage(msg, email):
     if send != '':
         log('正在发送邮件通知。。。')
         res = requests.post(url='http://www.zimo.wiki:8080/mail-sender/sendMail',
-                            data={'title': '今日校园自动签到结果通知', 'content': msg, 'to': send})
+                            data={'title': '今日校园自动签到结果通知', 'content': msg, 'to': send}, verify=not debug)
         code = res.json()['code']
         if code == 0:
             log('发送邮件通知成功。。。')

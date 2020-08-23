@@ -61,7 +61,7 @@
     ```shell script
     git clone https://github.com/ZimoLoveShuang/auto-sign.git
     ```
-2. 修改`config_xxxx.yml`中的对应配置，`xxxx`对应学校英文简称，如西南大学的简称是`swu`，对应的配置就是`config_swu.yml`，以此类推，修改`index.py`23行读取的配置文件参数
+2. 修改`config_xxxx.yml`中的对应配置，`xxxx`对应学校英文简称，如西南大学的简称是`swu`，对应的配置就是`config_swu.yml`，以此类推，修改`index.py`30行读取的配置文件参数
     ```python
     # 全局配置
     config = getYmlConfig(yaml_file='config.yml')
