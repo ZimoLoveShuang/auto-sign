@@ -41,7 +41,7 @@ def log(content):
 def getCpdailyApis(user):
     apis = {}
     user = user['user']
-    schools = requests.get(url='https://www.cpdaily.com/v6/config/guest/tenant/list').json()['data']
+    schools = requests.get(url='https://www.cpdaily.com/v6/config/guest/tenant/list', verify=not debug).json()['data']
     flag = True
     for one in schools:
         if one['name'] == user['school']:
@@ -52,7 +52,8 @@ def getCpdailyApis(user):
             params = {
                 'ids': one['id']
             }
-            res = requests.get(url='https://www.cpdaily.com/v6/config/guest/tenant/info', params=params)
+            res = requests.get(url='https://www.cpdaily.com/v6/config/guest/tenant/info', params=params,
+                               verify=not debug)
             data = res.json()['data'][0]
             joinType = data['joinType']
             idsUrl = data['idsUrl']
@@ -71,10 +72,13 @@ def getCpdailyApis(user):
                     'login-url'] = idsUrl + '/login?service=' + parse.scheme + r"%3A%2F%2F" + host + r'%2Fportal%2Flogin'
                 apis['host'] = host
             if joinType == 'NOTCLOUD':
-                res = requests.get(url=apis['login-url'])
+                res = requests.get(url=apis['login-url'], verify=not debug)
                 if urlparse(apis['login-url']).netloc != urlparse(res.url):
                     apis['login-url'] = res.url
             break
+    if user['school'] == '云南财经大学':
+        apis[
+            'login-url'] = 'http://idas.ynufe.edu.cn/authserver/login?service=https%3A%2F%2Fynufe.cpdaily.com%2Fportal%2Flogin'
     if flag:
         log(user['school'] + ' 未找到该院校信息，请检查是否是学校全称错误')
         exit(-1)
@@ -314,4 +318,4 @@ def main_handler(event, context):
 
 if __name__ == '__main__':
     # print(extension)
-    print(main_handler({},{}))
+    print(main_handler({}, {}))
