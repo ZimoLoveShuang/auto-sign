@@ -53,9 +53,7 @@
 
 # 使用
 
-## 可以参考[auto-submit项目](https://github.com/ZimoLoveShuang/auto-submit)
-
-## 非福州大学的学子
+## 参考[auto-submit项目](https://github.com/ZimoLoveShuang/auto-submit)
 
 1. 下载或者克隆此仓库到本地
     ```shell script
@@ -81,11 +79,6 @@
 #### 如遇到依赖问题，请去[`auto-sumit`](https://github.com/ZimoLoveShuang/auto-submit)项目下载`dependency.zip`，然后参考`auto-submit`项目的说明将函数依赖层添加到腾讯云函数
 
 #### 如果不知道怎么配置经纬度信息，可以访问[这里](http://zuobiao.ay800.com/s/27/index.php)，将经纬度四舍五入保留六位小数之后的放入配置文件对应位置即可
-
-
-## 福州大学的学子
-
-1. 参考[auto-submit项目](https://github.com/ZimoLoveShuang/auto-submit)的说明
 
 # 注意
 

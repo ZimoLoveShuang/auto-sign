@@ -16,7 +16,8 @@ sessionToken = ''
 ############配置############
 
 # 全局
-host = 'fzu.cpdaily.com'
+
+host = login.host
 session = requests.session()
 session.cookies = requests.utils.cookiejar_from_dict(Cookies)
 
