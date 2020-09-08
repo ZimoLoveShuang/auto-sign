@@ -315,9 +315,10 @@ def main():
 def main_handler(event, context):
     try:
         main()
+    except Exception as e:
+        raise e
+    else:
         return 'success'
-    except:
-        return 'fail'
 
 
 if __name__ == '__main__':
