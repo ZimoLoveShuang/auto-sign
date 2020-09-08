@@ -64,27 +64,25 @@ def getCpdailyApis(user):
             joinType = data['joinType']
             idsUrl = data['idsUrl']
             ampUrl = data['ampUrl']
-            ampUrl2 = data['ampUrl2']
             if 'campusphere' in ampUrl or 'cpdaily' in ampUrl:
                 parse = urlparse(ampUrl)
                 host = parse.netloc
+                res = requests.get(parse.scheme + '://' + host)
+                parse = urlparse(res.url)
                 apis[
                     'login-url'] = idsUrl + '/login?service=' + parse.scheme + r"%3A%2F%2F" + host + r'%2Fportal%2Flogin'
                 apis['host'] = host
+
+            ampUrl2 = data['ampUrl2']
             if 'campusphere' in ampUrl2 or 'cpdaily' in ampUrl2:
                 parse = urlparse(ampUrl2)
                 host = parse.netloc
+                res = requests.get(parse.scheme + '://' + host)
+                parse = urlparse(res.url)
                 apis[
                     'login-url'] = idsUrl + '/login?service=' + parse.scheme + r"%3A%2F%2F" + host + r'%2Fportal%2Flogin'
                 apis['host'] = host
-            if joinType == 'NOTCLOUD':
-                res = requests.get(url=apis['login-url'], verify=not debug)
-                if urlparse(apis['login-url']).netloc != urlparse(res.url):
-                    apis['login-url'] = res.url
             break
-    if user['school'] == '云南财经大学':
-        apis[
-            'login-url'] = 'http://idas.ynufe.edu.cn/authserver/login?service=https%3A%2F%2Fynufe.cpdaily.com%2Fportal%2Flogin'
     if flag:
         log(user['school'] + ' 未找到该院校信息，请检查是否是学校全称错误')
         exit(-1)
