@@ -190,8 +190,13 @@ def fillForm(task, session, user, apis):
             extraFieldItems = extraField['extraFieldItems']
             for extraFieldItem in extraFieldItems:
                 if extraFieldItem['content'] == default['value']:
-                    extraFieldItemValue = {'extraFieldItemValue': default['value'],
-                                           'extraFieldItemWid': extraFieldItem['wid']}
+                    # 是否为其它(单选+文本)类型选项
+                    if extraFieldItem['isOtherItems'] == 1:
+                        extraFieldItemValue = {'extraFieldItemValue': default['otherValue'],
+                                               'extraFieldItemWid': extraFieldItem['wid']}
+                    else:
+                        extraFieldItemValue = {'extraFieldItemValue': default['value'],
+                                               'extraFieldItemWid': extraFieldItem['wid']}
                     extraFieldItemValues.append(extraFieldItemValue)
         # log(extraFieldItemValues)
         # 处理带附加选项的签到
