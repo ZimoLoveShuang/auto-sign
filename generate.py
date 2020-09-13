@@ -32,6 +32,9 @@ def generate():
             exit(-1)
         one['title'] = extraField['title']
         one['value'] = extraFieldItems[choose - 1]['content']
+        if extraFieldItem['isOtherItems'] == 1:
+            text = input('\t' + extraFieldItems[choose - 1]['content'] + '，请输入额外文本：')
+            one['other'] = text
         default['default'] = one
         defaults.append(default)
     print('======================分隔线======================')

@@ -106,6 +106,7 @@ def getSession(user, apis):
     # 借助上一个项目开放出来的登陆API，模拟登陆
     res = requests.post(url=config['login']['api'], data=params, verify=not debug)
     # cookieStr可以使用手动抓包获取到的cookie，有效期暂时未知，请自己测试
+    # cookieStr = str(res.json()['cookies'])
     cookieStr = str(res.json()['cookies'])
     log(cookieStr)
     if cookieStr == 'None':
@@ -184,7 +185,7 @@ def fillForm(task, session, user, apis):
         for i in range(0, len(extraFields)):
             default = defaults[i]['default']
             extraField = extraFields[i]
-            if default['title'] != extraField['title']:
+            if config['cpdaily']['check'] and default['title'] != extraField['title']:
                 log('第%d个默认配置项错误，请检查' % (i + 1))
                 exit(-1)
             extraFieldItems = extraField['extraFieldItems']
@@ -192,6 +193,10 @@ def fillForm(task, session, user, apis):
                 if extraFieldItem['content'] == default['value']:
                     extraFieldItemValue = {'extraFieldItemValue': default['value'],
                                            'extraFieldItemWid': extraFieldItem['wid']}
+                    # 其他，额外文本
+                    if extraFieldItem['isOtherItems'] == 1:
+                        extraFieldItemValue = {'extraFieldItemValue': default['other'],
+                                               'extraFieldItemWid': extraFieldItem['wid']}
                     extraFieldItemValues.append(extraFieldItemValue)
         # log(extraFieldItemValues)
         # 处理带附加选项的签到
