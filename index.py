@@ -52,8 +52,8 @@ def getCpdailyApis(user):
     for one in schools:
         if one['name'] == user['school']:
             if one['joinType'] == 'NONE':
-                log(user['school'] + ' 未加入今日校园')
-                exit(-1)
+                #log(user['school'] + ' 未加入今日校园')
+                raise Exception(user['school'] + ' 未加入今日校园')
             flag = False
             params = {
                 'ids': one['id']
@@ -84,8 +84,8 @@ def getCpdailyApis(user):
                 apis['host'] = host
             break
     if flag:
-        log(user['school'] + ' 未找到该院校信息，请检查是否是学校全称错误')
-        exit(-1)
+        #log(user['school'] + ' 未找到该院校信息，请检查是否是学校全称错误')
+        raise Exception(user['school'] + ' 未找到该院校信息，请检查是否是学校全称错误')
     log(apis)
     return apis
 
@@ -110,8 +110,8 @@ def getSession(user, apis):
     cookieStr = str(res.json()['cookies'])
     log(cookieStr)
     if cookieStr == 'None':
-        log(res.json())
-        exit(-1)
+        #log(res.json())
+        raise Exception(res.json())
     # log(cookieStr)
 
     # 解析cookie
@@ -142,8 +142,8 @@ def getUnSignedTasks(session, apis):
         url='https://{host}/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay'.format(host=apis['host']),
         headers=headers, data=json.dumps({}), verify=not debug)
     if len(res.json()['datas']['unSignedTasks']) < 1:
-        log('当前没有未签到任务')
-        exit(-1)
+        #log('当前没有未签到任务')
+        raise Exception('当前没有未签到任务')
     # log(res.json())
     latestTask = res.json()['datas']['unSignedTasks'][0]
     return {
@@ -186,8 +186,8 @@ def fillForm(task, session, user, apis):
             default = defaults[i]['default']
             extraField = extraFields[i]
             if config['cpdaily']['check'] and default['title'] != extraField['title']:
-                log('第%d个默认配置项错误，请检查' % (i + 1))
-                exit(-1)
+                #log('第%d个默认配置项错误，请检查' % (i + 1))
+                raise Exception('第%d个默认配置项错误，请检查' % (i + 1))
             extraFieldItems = extraField['extraFieldItems']
             for extraFieldItem in extraFieldItems:
                 if extraFieldItem['content'] == default['value']:
@@ -284,9 +284,9 @@ def submitForm(session, user, form, apis):
         log('自动签到成功')
         sendMessage('自动签到成功', user['email'])
     else:
-        log('自动签到失败，原因是：' + message)
+        #log('自动签到失败，原因是：' + message)
         # sendMessage('自动签到失败，原因是：' + message, user['email'])
-        exit(-1)
+        raise Exception('自动签到失败，原因是：' + message)
 
 
 # 发送邮件通知
@@ -313,7 +313,10 @@ def main():
         task = getDetailTask(session, params, apis)
         form = fillForm(task, session, user, apis)
         # form = getDetailTask(session, user, params, apis)
-        submitForm(session, user, form, apis)
+        try:
+            submitForm(session, user, form, apis)
+        except Exception as e:
+            log(e)
 
 
 # 提供给腾讯云函数调用的启动函数
