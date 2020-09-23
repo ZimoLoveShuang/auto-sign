@@ -113,6 +113,7 @@ def fillForm(task):
         for i in range(0, len(extraFields)):
             default = defaults[i]['default']
             extraField = extraFields[i]
+            print(extraField)
             # https://github.com/ZimoLoveShuang/auto-sign/issues/5#issuecomment-692752556
             if config['cpdaily']['check'] and default['title'] != extraField['title']:
                 log('第%d个默认配置项错误，请检查' % (i + 1))
