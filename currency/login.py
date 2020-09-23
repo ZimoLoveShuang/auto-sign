@@ -303,14 +303,22 @@ def login():
     updateACwTc(data)
     # 5. 获取mod_auth_cas
     getModAuthCas(data)
-    print('==============sessionToken填写到index.py==============')
+    print('==============sessionToken==============')
     sessionToken = data['sessionToken']
     print(sessionToken)
-    print('==============CpdailyInfo填写到index.py==============')
+    print('==============CpdailyInfo==============')
     print(CpdailyInfo)
-    print('==============Cookies填写到index.py==============')
+    print('==============Cookies==============')
     print(requests.utils.dict_from_cookiejar(session.cookies))
-
+    # Save session data
+    session_data = {
+        "sessionToken": sessionToken,
+        "CpdailyInfo": CpdailyInfo,
+        "Cookies": requests.utils.dict_from_cookiejar(session.cookies)
+    }
+    print('正在写入 session.yml ...')
+    with open('session.yml', 'w') as f:
+        yaml.dump(session_data, f, allow_unicode=True)
 
 if __name__ == '__main__':
     login()

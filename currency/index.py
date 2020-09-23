@@ -6,20 +6,17 @@ import yaml
 import login
 from datetime import datetime, timedelta, timezone
 
-############配置############
+# 全局
+
 Cookies = {
     'acw_tc': '',
     'MOD_AUTH_CAS': '',
 }
 CpdailyInfo = ''
 sessionToken = ''
-############配置############
-
-# 全局
 
 host = login.host
 session = requests.session()
-session.cookies = requests.utils.cookiejar_from_dict(Cookies)
 
 
 # 读取yml配置
@@ -30,6 +27,18 @@ def getYmlConfig(yaml_file='config.yml'):
     config = yaml.load(file_data, Loader=yaml.FullLoader)
     return dict(config)
 
+def restoreSessionFromYml(yaml_file='session.yml'):
+    global session, Cookies, CpdailyInfo, sessionToken
+    
+    f = open(yaml_file, 'r', encoding="utf-8")
+    file_data = f.read()
+    f.close()
+    session_data = dict(yaml.load(file_data, Loader=yaml.FullLoader))
+    Cookies = session_data["Cookies"]
+    CpdailyInfo = session_data["CpdailyInfo"]
+    sessionToken = session_data["sessionToken"]
+
+    session.cookies = requests.utils.cookiejar_from_dict(Cookies)
 
 config = getYmlConfig()
 user = config['user']
@@ -104,7 +113,8 @@ def fillForm(task):
         for i in range(0, len(extraFields)):
             default = defaults[i]['default']
             extraField = extraFields[i]
-            if default['title'] != extraField['title']:
+            # https://github.com/ZimoLoveShuang/auto-sign/issues/5#issuecomment-692752556
+            if config['cpdaily']['check'] and default['title'] != extraField['title']:
                 log('第%d个默认配置项错误，请检查' % (i + 1))
                 exit(-1)
             extraFieldItems = extraField['extraFieldItems']
@@ -168,6 +178,7 @@ def sendMessage(msg, email):
 
 
 def main():
+    restoreSessionFromYml()
     data = {
         'sessionToken': sessionToken
     }
