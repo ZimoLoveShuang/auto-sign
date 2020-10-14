@@ -124,7 +124,7 @@ def getSession(user, apis):
 
 
 # 获取最新未签到任务并全部签到
-def getUnSignedTasksAndSign(session, apis):
+def getUnSignedTasksAndSign(session, apis, user):
     headers = {
         'Accept': 'application/json, text/plain, */*',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
@@ -316,7 +316,7 @@ def main():
     for user in config['users']:
         apis = getCpdailyApis(user)
         session = getSession(user, apis)
-        getUnSignedTasksAndSign(session, apis)
+        getUnSignedTasksAndSign(session, apis, user)
 
 
 # 提供给腾讯云函数调用的启动函数
