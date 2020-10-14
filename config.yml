@@ -1,7 +1,7 @@
 #登陆相关配置
 login:
   #开放的模拟登陆api服务器地址
-  api: "http://www.zimo.wiki:8080/wisedu-unified-login-api-v1.0/api/login"
+  api: "http://127.0.0.1:8080/wisedu-unified-login-api-v1.0/api/login"
 #用户组配置
 users:
   #单个用户配置
@@ -10,8 +10,8 @@ users:
       username: '161105024'
       #password 密码
       password: '161105024'
-      #address 地址，定位信息
-      address: 中国河南省xx市xx区xx路
+      #address 地址，定位信息  中国河南省xx市xx区xx路
+      address: 中国河南省
       #email 接受通知消息的邮箱
       email: 461009747@qq.com
       #school 学校全称
