@@ -1,7 +1,7 @@
 #登陆相关配置
 login:
   #开放的模拟登陆api服务器地址
-  api: "http://127.0.0.1:8080/wisedu-unified-login-api-v1.0/api/login"
+  api: "http://www.zimo.wiki:8080/wisedu-unified-login-api-v1.0/api/login"
 #用户组配置
 users:
   #单个用户配置
