@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 from urllib3.exceptions import InsecureRequestWarning
 
 # debug模式
-debug = False
+debug = True
 if debug:
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -108,7 +108,7 @@ def getSession(user, apis):
     # cookieStr可以使用手动抓包获取到的cookie，有效期暂时未知，请自己测试
     # cookieStr = str(res.json()['cookies'])
     cookieStr = str(res.json()['cookies'])
-    log(cookieStr)
+    # log(cookieStr) 调试时再输出
     if cookieStr == 'None':
         log(res.json())
         exit(-1)
@@ -123,8 +123,8 @@ def getSession(user, apis):
     return session
 
 
-# 获取最新未签到任务
-def getUnSignedTasks(session, apis):
+# 获取最新未签到任务并全部签到
+def getUnSignedTasksAndSign(session, apis):
     headers = {
         'Accept': 'application/json, text/plain, */*',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
@@ -145,11 +145,18 @@ def getUnSignedTasks(session, apis):
         log('当前没有未签到任务')
         exit(-1)
     # log(res.json())
-    latestTask = res.json()['datas']['unSignedTasks'][0]
-    return {
-        'signInstanceWid': latestTask['signInstanceWid'],
-        'signWid': latestTask['signWid']
-    }
+    for i in range(0, len(res.json()['datas']['unSignedTasks'])):
+       #if '出校' in res.json()['datas']['unSignedTasks'][i]['taskName'] == False:
+        # if '入校' in res.json()['datas']['unSignedTasks'][i]['taskName'] == False:
+            latestTask = res.json()['datas']['unSignedTasks'][i]
+            params = {
+              'signInstanceWid': latestTask['signInstanceWid'],
+              'signWid': latestTask['signWid']
+            }
+            task = getDetailTask(session, params, apis)
+            form = fillForm(task, session, user, apis)
+            
+            submitForm(session, user, form, apis)
 
 
 # 获取签到任务详情
@@ -259,7 +266,7 @@ def submitForm(session, user, form, apis):
         "lon": user['lon'],
         "model": "OPPO R11 Plus",
         "appVersion": "8.1.14",
-        "systemVersion": "4.4.4",
+        "systemVersion": "8.0",
         "userId": user['username'],
         "systemName": "android",
         "lat": user['lat'],
@@ -309,11 +316,7 @@ def main():
     for user in config['users']:
         apis = getCpdailyApis(user)
         session = getSession(user, apis)
-        params = getUnSignedTasks(session, apis)
-        task = getDetailTask(session, params, apis)
-        form = fillForm(task, session, user, apis)
-        # form = getDetailTask(session, user, params, apis)
-        submitForm(session, user, form, apis)
+        getUnSignedTasksAndSign(session, apis)
 
 
 # 提供给腾讯云函数调用的启动函数
