@@ -109,7 +109,6 @@ def getSession(user, apis):
         res = requests.post(url=config['login']['api'], data=params, verify=not debug)
     except Exception as e:
         res = requests.post(url='http://127.0.0.1:8080/wisedu-unified-login-api-v1.0/api/login', data=params, verify=not debug)
-        raise e
     
     # cookieStr可以使用手动抓包获取到的cookie，有效期暂时未知，请自己测试
     # cookieStr = str(res.json()['cookies'])
