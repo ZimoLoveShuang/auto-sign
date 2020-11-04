@@ -304,16 +304,25 @@ def submitForm(session, user, form, apis):
 # 发送邮件通知
 def sendMessage(msg, email):
     send = email
-    if send != '':
-        log('正在发送邮件通知。。。')
-        res = requests.post(url='http://www.zimo.wiki:8080/mail-sender/sendMail',
-                            data={'title': '今日校园自动签到结果通知', 'content': msg, 'to': send}, verify=not debug)
-        code = res.json()['code']
-        if code == 0:
-            log('发送邮件通知成功。。。')
-        else:
-            log('发送邮件通知失败。。。')
-            log(res.json())
+    if msg.count("未开始")>0:
+        return ''
+    try:
+        if send != '':
+                log('正在发送邮件通知。。。')
+                log(getTimeStr())
+ #               sendMessageWeChat(msg + getTimeStr(), '今日校园自动签到结果通知')
+    
+                res = requests.post(url='http://www.zimo.wiki:8080/mail-sender/sendMail',
+                            data={'title': '今日校园自动签到结果通知' + getTimeStr(), 'content': msg, 'to': send}, verify=not debug)
+                code = res.json()['code']
+                if code == 0:
+                    log('发送邮件通知成功。。。')
+                else:
+                    log('发送邮件通知失败。。。')
+                log(res.json())
+    except Exception as e:
+        log("send failed")
+
 
 
 # 主函数
