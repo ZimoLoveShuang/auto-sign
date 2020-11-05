@@ -387,7 +387,7 @@ def email_manager(msg, to):
     import smtplib
 
     sender = 'xyh.hainanu@qq.com'
-    password = 'uaybkktfcjyxeedc'
+    password = ''
     smtp_server = 'smtp.qq.com'
 
     message = MIMEText(msg, 'plain', 'utf-8')
