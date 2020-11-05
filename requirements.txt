@@ -1,10 +1,11 @@
 pyDes==2.0.1
-aliyun-python-sdk-core==2.13.20
 aliyun-python-sdk-core-v3==2.13.11
-aliyun-python-sdk-kms==2.10.1
-oss2==2.12.1
-pytz==2019.3
+oss2~=2.13.0
+pytz~=2020.1
 PyYAML==5.3.1
-requests==2.23.0
+requests~=2.24.0
 tzlocal==2.0.0
-urllib3==1.25.8
+urllib3~=1.25.9
+
+gevent~=20.6.2
+yaml~=0.2.5
