@@ -98,6 +98,9 @@ def DESDecrypt(s, key='XCE927=='):
     k = des(key, CBC, iv, pad=None, padmode=PAD_PKCS5)
     return k.decrypt(s)
 
+# Accept config file path from argv[2]
+# TODO: Do this in main()
+config_file = sys.argv[2] if len(sys.argv) > 2 else 'config.yml'
 
 # 全局配置
 config = getYmlConfig()
