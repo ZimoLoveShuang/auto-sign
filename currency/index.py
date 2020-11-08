@@ -71,9 +71,10 @@ def getUnSignedTasks():
         'Accept-Language': 'zh-CN,en-US;q=0.8',
     }
     params = {}
-    url = 'https://{host}/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay'.format(host=host)
+    # url = 'https://{host}/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay'.format(host=host)
+    url = 'https://{host}/wec-counselor-sign-apps/stu/sign/queryDailySginTasks'.format(host=host)
     res = session.post(url=url, headers=headers, data=json.dumps(params))
-    # log(res.json())
+    log(res.json())
     unSignedTasks = res.json()['datas']['unSignedTasks']
     if len(unSignedTasks) < 1:
         log('当前没有未签到任务')
@@ -98,6 +99,7 @@ def getDetailTask(params):
     res = session.post(
         url='https://{host}/wec-counselor-sign-apps/stu/sign/detailSignInstance'.format(host=host),
         headers=headers, data=json.dumps(params))
+    print(host, res)
     data = res.json()['datas']
     return data
 
@@ -151,7 +153,7 @@ def submitForm(form):
         # 'Host': 'swu.cpdaily.com',
         'Connection': 'Keep-Alive'
     }
-    res = session.post(url='https://{host}/wec-counselor-sign-apps/stu/sign/submitSign'.format(host=host),
+    res = session.post(url='https://{host}/wec-counselor-sign-apps/stu/sign/completeSignIn'.format(host=host),
                        headers=headers, data=json.dumps(form))
     message = res.json()['message']
     if message == 'SUCCESS':
@@ -198,7 +200,8 @@ def main_handler(event, context):
     try:
         main()
         return 'success'
-    except:
+    except Exception as e:
+        raise e
         return 'fail'
 
 
