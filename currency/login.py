@@ -291,7 +291,7 @@ def getModAuthCas(data):
 
 
 # 通过手机号和验证码进行登陆
-def login():
+def login(dest="session.yml"):
     # 1. 获取验证码
     getMessageCode()
     code = input("请输入验证码：")
@@ -316,9 +316,14 @@ def login():
         "CpdailyInfo": CpdailyInfo,
         "Cookies": requests.utils.dict_from_cookiejar(session.cookies)
     }
-    print('正在写入 session.yml ...')
-    with open('session.yml', 'w') as f:
+    print('正在写入 {} ...'.format(dest))
+    with open(dest, 'w') as f:
         yaml.dump(session_data, f, allow_unicode=True)
 
 if __name__ == '__main__':
-    login()
+    session_file = "session.yml"
+    try:
+        session_file = sys.argv[1]
+    except:
+        pass
+    login(session_file)

@@ -1,0 +1,15 @@
+# multiple.py 的签到任务列表
+# 是 YAML 格式的列表
+-
+  # config: config.yml的路径
+  # 可使用相对或绝对路径，注意 CWD
+  config: 'config.yml'
+  # 同上
+  session: 'session.yml'
+-
+  config: '/path/to/config.yml'
+  session: '/path/to/session.yml'
+-
+  # Windows 下的路径分隔符使用反斜杠
+  config: 'D:\\AutoSign\\config.yml'
+  session: 'D:\\AutoSign\\session.yml'
