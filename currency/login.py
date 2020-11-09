@@ -103,7 +103,7 @@ def DESDecrypt(s, key='XCE927=='):
 config_file = sys.argv[2] if len(sys.argv) > 2 else 'config.yml'
 
 # 全局配置
-config = getYmlConfig()
+config = getYmlConfig(config_file)
 session = requests.session()
 user = config['user']
 # Cpdaily-Extension
