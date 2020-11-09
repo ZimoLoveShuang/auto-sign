@@ -78,7 +78,7 @@ def getUnSignedTasks():
     unSignedTasks = res.json()['datas']['unSignedTasks']
     if len(unSignedTasks) < 1:
         log('当前没有未签到任务')
-        exit(-1)
+        raise Exception('当前没有未签到任务')
     latestTask = unSignedTasks[0]
     return {
         'signInstanceWid': latestTask['signInstanceWid'],
@@ -119,7 +119,7 @@ def fillForm(task):
             # https://github.com/ZimoLoveShuang/auto-sign/issues/5#issuecomment-692752556
             if config['cpdaily']['check'] and default['title'] != extraField['title']:
                 log('第%d个默认配置项错误，请检查' % (i + 1))
-                exit(-1)
+                raise ValueError('第%d个默认配置项错误，请检查' % (i + 1))
             extraFieldItems = extraField['extraFieldItems']
             for extraFieldItem in extraFieldItems:
                 if extraFieldItem['content'] == default['value']:
@@ -161,7 +161,7 @@ def submitForm(form):
         sendMessage('自动签到成功', user['email'])
     else:
         log('自动签到失败，原因是：' + message)
-        exit(-1)
+        raise Exception('自动签到失败，原因是：' + message)
         # sendMessage('自动签到失败，原因是：' + message, user['email'])
 
 
