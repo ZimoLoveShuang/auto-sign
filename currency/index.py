@@ -6,20 +6,17 @@ import yaml
 import login
 from datetime import datetime, timedelta, timezone
 
-############配置############
+# 全局
+
 Cookies = {
     'acw_tc': '',
     'MOD_AUTH_CAS': '',
 }
 CpdailyInfo = ''
 sessionToken = ''
-############配置############
-
-# 全局
 
 host = login.host
 session = requests.session()
-session.cookies = requests.utils.cookiejar_from_dict(Cookies)
 
 
 # 读取yml配置
@@ -30,6 +27,18 @@ def getYmlConfig(yaml_file='config.yml'):
     config = yaml.load(file_data, Loader=yaml.FullLoader)
     return dict(config)
 
+def restoreSessionFromYml(yaml_file='session.yml'):
+    global session, Cookies, CpdailyInfo, sessionToken
+    
+    f = open(yaml_file, 'r', encoding="utf-8")
+    file_data = f.read()
+    f.close()
+    session_data = dict(yaml.load(file_data, Loader=yaml.FullLoader))
+    Cookies = session_data["Cookies"]
+    CpdailyInfo = session_data["CpdailyInfo"]
+    sessionToken = session_data["sessionToken"]
+
+    session.cookies = requests.utils.cookiejar_from_dict(Cookies)
 
 config = getYmlConfig()
 user = config['user']
@@ -62,13 +71,14 @@ def getUnSignedTasks():
         'Accept-Language': 'zh-CN,en-US;q=0.8',
     }
     params = {}
-    url = 'https://{host}/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay'.format(host=host)
+    # url = 'https://{host}/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay'.format(host=host)
+    url = 'https://{host}/wec-counselor-sign-apps/stu/sign/queryDailySginTasks'.format(host=host)
     res = session.post(url=url, headers=headers, data=json.dumps(params))
-    # log(res.json())
+    log(res.json())
     unSignedTasks = res.json()['datas']['unSignedTasks']
     if len(unSignedTasks) < 1:
         log('当前没有未签到任务')
-        exit(-1)
+        raise Exception('当前没有未签到任务')
     latestTask = unSignedTasks[0]
     return {
         'signInstanceWid': latestTask['signInstanceWid'],
@@ -87,8 +97,9 @@ def getDetailTask(params):
         'Content-Type': 'application/json;charset=UTF-8'
     }
     res = session.post(
-        url='https://{host}/wec-counselor-sign-apps/stu/sign/detailSignInstance'.format(host=host),
+        url='https://{host}/wec-counselor-sign-apps/stu/sign/detailSignTaskInst'.format(host=host),
         headers=headers, data=json.dumps(params))
+    print(host, res)
     data = res.json()['datas']
     return data
 
@@ -104,9 +115,11 @@ def fillForm(task):
         for i in range(0, len(extraFields)):
             default = defaults[i]['default']
             extraField = extraFields[i]
-            if default['title'] != extraField['title']:
+            print(extraField)
+            # https://github.com/ZimoLoveShuang/auto-sign/issues/5#issuecomment-692752556
+            if config['cpdaily']['check'] and default['title'] != extraField['title']:
                 log('第%d个默认配置项错误，请检查' % (i + 1))
-                exit(-1)
+                raise ValueError('第%d个默认配置项错误，请检查' % (i + 1))
             extraFieldItems = extraField['extraFieldItems']
             for extraFieldItem in extraFieldItems:
                 if extraFieldItem['content'] == default['value']:
@@ -140,7 +153,7 @@ def submitForm(form):
         # 'Host': 'swu.cpdaily.com',
         'Connection': 'Keep-Alive'
     }
-    res = session.post(url='https://{host}/wec-counselor-sign-apps/stu/sign/submitSign'.format(host=host),
+    res = session.post(url='https://{host}/wec-counselor-sign-apps/stu/sign/completeSignIn'.format(host=host),
                        headers=headers, data=json.dumps(form))
     message = res.json()['message']
     if message == 'SUCCESS':
@@ -148,7 +161,7 @@ def submitForm(form):
         sendMessage('自动签到成功', user['email'])
     else:
         log('自动签到失败，原因是：' + message)
-        exit(-1)
+        raise Exception('自动签到失败，原因是：' + message)
         # sendMessage('自动签到失败，原因是：' + message, user['email'])
 
 
@@ -168,6 +181,7 @@ def sendMessage(msg, email):
 
 
 def main():
+    restoreSessionFromYml()
     data = {
         'sessionToken': sessionToken
     }
@@ -186,7 +200,8 @@ def main_handler(event, context):
     try:
         main()
         return 'success'
-    except:
+    except Exception as e:
+        raise e
         return 'fail'
 
 

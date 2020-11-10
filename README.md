@@ -28,4 +28,5 @@
 
 1. 项目依赖于我的开源项目[模拟登陆 金智教务统一登陆系统 的API](https://github.com/ZimoLoveShuang/wisedu-unified-login-api)
 2. `Cpdaily-Extension`本质上就是对一个json对象进行了des加密，然后编码为了Base64字符串，加密解密实现可以参考[Java版](https://github.com/ZimoLoveShuang/yibinu-score-crawler/blob/master/src/main/java/wiki/zimo/scorecrawler/helper/DESHelper.java) [python版](https://github.com/ZimoLoveShuang/auto-submit/blob/master/currency/encrypt.py)
-3. 也欢迎其他学校学子在此提交适用于自己学校的配置，命名规则为`config_xxxx.yml`，`xxxx`为学校英文简称
+3. 也欢迎其他学校学子在此提交适用于自己学校的配置，命名规则为`config_xxxx.sample.yml`，`xxxx`为学校英文简称
+4. 请复制`config.sample.yml`文件，新文件命名为`config.yml`

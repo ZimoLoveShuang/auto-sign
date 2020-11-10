@@ -19,6 +19,8 @@ user:
   photo:
 #今日校园相关配置
 cpdaily:
+  #是否严格检查问题：true检查，false不检查
+  check: false
   #附加信息组默认选项配置，没有可留空
   defaults:
     #附加信息组默认选项配置，按顺序，可留空
