@@ -235,7 +235,7 @@ def uploadPicture(session, image, apis):
         'signature':signature
     }
     data_file = {
-        'file':(('blob',open(image,'rb')),'image/jpg')
+        'file':('blob',open(image,'rb'),'image/jpg')
     }
     res = session.post(url=url,data=data,files=data_file)
     if(res.status_code == requests.codes.ok):
