@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+<meta charset="UTF-8">
+<title></title>
+
+<link rel='stylesheet' href="static/css/style.css">
+<link rel="stylesheet" href="static/css/bootstrap.min.css">
+<script type="text/javascript" src="static/js/jquery.min.js"></script>
+<!---图标库--->
+<link rel='stylesheet' href='https://unicons.iconscout.com/release/v2.1.9/css/unicons.css'>
+<script type="text/javascript">
+$(function(){
+      $("#btn4").click(function(){
+               var emailText = $("#email").val();
+               //2 创建正则表达式对象
+               var emailPatt = /^[a-z\d]+(\.[a-z\d]+)*@([\da-z](-[\da-z])?)+(\.{1,2}[a-z]+)+$/;
+               //3 使用test方法验证是否合法
+               if (!emailPatt.test(emailText)) {
+                //4 提示用户
+                $("span.errorMsg").text("邮箱格式不合法！");
+				alert("邮箱格式不合法")
+                return false;
+                }else{
+                  $.ajax({
+                    type:"POST",
+                    url :"sendEmailServlet?random"+Math.random(),
+                    data:{
+                      email:$("#email").val(),
+                    },
+                    success:function(data){
+                      alert("验证码发送成功，请注意查收。");
+                    },
+                  })
+                }
+              }
+      );
+      //  判断用户是否可以注册
+      $("#submit").click(function() {
+        if ($("#email").val()) {
+          $("#RegistForm").submit();
+        } else { //  如果没有值
+          $("#notice").html("请填写完整信息");
+          setTimeout(function() {
+            $("#notice").hide();
+          }, 1000);
+        }
+      });
+    });
+</script>
+</head>
+<body>
+	<div class="section">
+		<div class="container">
+			<div class="row full-height justify-content-center">
+				<div class="col-12 text-center align-self-center py-5">
+					<div class="section pb-5 pt-5 pt-sm-2 text-center">
+						<h6 class="mb-0 pb-3"><span>登录</span><span>注册</span></h6>
+			          	<input class="checkbox" type="checkbox" id="reg-log" name="reg-log">
+			          	<label for="reg-log"></label>
+						<div class="card-3d-wrap mx-auto">
+							<div class="card-3d-wrapper">
+								<div class="card-front">
+									<div class="center-wrap">
+										<div class="section text-center">
+											<h4 class="mb-4 pb-3">登录</h4>
+											<div class="form-group">
+												<input type="email" name="logemail" class="form-style" placeholder="邮箱" id="logemail" autocomplete="off">
+												<i class="input-icon uil uil-at"></i>
+											</div>	
+											<div class="form-group mt-2">
+												<input type="password" name="logpass" class="form-style" placeholder="密码" id="logpass" autocomplete="off">
+												<i class="input-icon uil uil-lock-alt"></i>
+											</div>
+											<a href="#" class="btn mt-4">提交</a>
+                            				<p class="mb-0 mt-4 text-center"><a href="#0" class="link">忘记密码?</a></p>
+				      					</div>
+			      					</div>
+			      				</div>
+								<div class="card-back">
+									<div class="center-wrap">
+										<div class="section text-center">
+											<h4 class="mb-4 pb-3">注册</h4>
+											<form  id="RegistForm" method="post" action="${pageContext.request.contextPath}/registServlet">
+											<div class="form-group">
+												<input type="text" name="username" class="form-style" placeholder="请输入账号..." id="username" autocomplete="off" required="required">
+												<i class="input-icon uil uil-user"></i>
+											</div>
+											 <div class="form-group mt-2">
+                                                <input type="password" name="password" class="form-style" placeholder="请输入密码" id="password" autocomplete="off" required="required">
+                                                <i class="input-icon uil uil-lock-alt"></i>
+                                            </div>	
+											<div class="form-group mt-2">
+												<input type="email" name="email" class="form-style" placeholder="请填写邮箱地址..." id="email" autocomplete="off" required="required">
+												<i class="input-icon uil uil-at"></i>
+											</div>	
+											
+											<div class="form-group mt-2">
+												<input type="text" name="code" class="form-style" placeholder="请输入邮箱的验证码" id="code" autocomplete="off" required="required">
+												<i class="input-icon uil uil-lock-alt"></i>
+											</div>
+											<span id="notice" class="hide" style="font-size: 10px;">请先完成邮箱验证</span><br />
+											<input class="btn mt-4" type="submit" id="submit" value="邮箱注册" />
+											<input type="button" name="btn" class="btn mt-4" id="btn4" value="发送验证码" />
+											<span class="errorMsg">
+											
+										    </span>
+				      					</form>
+										</div>
+			      					</div>
+			      				</div>
+			      			</div>
+			      		</div>
+			      	</div>
+		      	</div>
+	      	</div>
+	    </div>
+	</div>
+
+</body>
+</html>

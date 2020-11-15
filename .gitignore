@@ -2,3 +2,8 @@
 venv/
 database/eet.json
 database/config_user.csv
+database/stu_info/*.json
+database/机器人与人工智能协会(324927282).json
+database/机器人与人工智能协会(324927282).json
+*.json
+database/eet.json

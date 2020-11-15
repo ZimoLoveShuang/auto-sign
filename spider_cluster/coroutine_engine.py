@@ -1,13 +1,11 @@
 from gevent import monkey
 
 monkey.patch_all()
+import sys
 import gevent
 from gevent.queue import Queue
 
-import threading
-
 from middleware.data_IO import refresh_database
-from config import ROOT_PATH_CONFIG_USER
 
 
 class CoroutineEngine(object):
@@ -26,14 +24,10 @@ class CoroutineEngine(object):
 
         self.max_queue_size = 0
         self.now_queue_size = 0
+        self.power = power
+        self.progress_name = progress_name
         self.work_Q = Queue()
-        self.load_tasks(tasks=user_cluster)
-
-        # 限制协程功率
-        self.power = self.max_queue_size if power >= self.max_queue_size else power
-
-        # 启动进度条
-        threading.Thread(target=self.progress_manager, args=(self.max_queue_size, progress_name)).start()
+        self.user_cluster = user_cluster
 
         # 驱动器
         self.core = core
@@ -47,6 +41,8 @@ class CoroutineEngine(object):
             for key, value in data.items():
                 self.work_Q.put_nowait(value)
         self.max_queue_size = self.work_Q.qsize()
+        # 弹性协程
+        self.power = 72 if self.max_queue_size >= 72 else self.max_queue_size
 
     def launch(self):
         while not self.work_Q.empty():
@@ -93,8 +89,19 @@ class CoroutineEngine(object):
         :return:
         """
         task_list = []
+
+        # 刷新任务队列
+        self.load_tasks(tasks=self.user_cluster)
+
+        # 启动进度条
+        if 'linux' not in sys.platform:
+            exec("import threading\nthreading.Thread(target=self.progress_manager,\n"
+                 "args=(self.max_queue_size, self.progress_name + '[{}]'.format(self.power))).start()")
+
+        # 弹性协程
         if not speed_up:
             self.power = 1
+
         for x in range(self.power):
             task = gevent.spawn(self.launch)
             task_list.append(task)

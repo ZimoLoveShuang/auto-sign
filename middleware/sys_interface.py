@@ -1,3 +1,6 @@
+from gevent import monkey
+
+monkey.patch_all()
 from spider_cluster.coroutine_engine import CampusDailySpeedUp
 from spider_cluster.action_slaver.hainanu import HainanUniversity
 from middleware.deployment import deployment
@@ -16,6 +19,7 @@ def sys_interface(deployPlan: bool = None, coroutine_speed_up: bool = None, core
     """
     import sys
 
+    # 读取配置文件路径
     config_path = ROOT_PATH_CONFIG_USER
 
     # 默认linux下自动挂起
@@ -30,12 +34,13 @@ def sys_interface(deployPlan: bool = None, coroutine_speed_up: bool = None, core
         core = HainanUniversity()
     if speed_up_way is None:
         speed_up_way = CampusDailySpeedUp
-    print('协程核心已装载，任务即将执行...')
+    print('>>> 协程核心已装载，任务即将执行...')
 
-    # 接管任务
+    # 接管任务：调度器部署定时任务
     if deployPlan:
-        print('任务已部署...')
+        print('>>> 任务已部署...')
         deployment(speed_up_way(core=core, config_path=config_path).run)
+    # 调用协程控制器
     else:
         speed_up_way(core=core, config_path=config_path).run(speed_up=coroutine_speed_up)
-        print('任务结束...')
+        print('>>> 任务结束...')

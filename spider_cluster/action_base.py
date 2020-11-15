@@ -1,62 +1,114 @@
 import json
 import base64
 from datetime import datetime
+from urllib.parse import urlparse
 
 import requests
 import uuid
 from pyDes import des, CBC, PAD_PKCS5
+from requests.exceptions import *
 from middleware.info_manager import send_email
+from config import ADDRESS, LONGITUDE, LATITUDE, QnA, ABNORMAL_REASON, TIME_ZONE_CN, DEBUG
+from spider_cluster.gain import ProxyGenerator
 
-from config import ADDRESS, LONGITUDE, LATITUDE, QnA, LOGGING_API, ABNORMAL_REASON, TIME_ZONE_CN, DEBUG
+# 原创者API
+LOGGING_API = "http://www.zimo.wiki:8080/wisedu-unified-login-api-v1.0/api/login"
 
 
 # 交互仓库
 class ActionBase(object):
     """交互仓库"""
 
-    for_hainanu_server = True
-    silence = False
+    def __init__(self, silence=False, ):
+        # 静默模式
+        self.silence = silence
+        self.login_url = ''
+        self.school_token = None
+        # 错误日志
+        self.error_msg = ''
+        self.user_info = None
+        self.apis = dict()
 
     # 获取今日校园api
-    @staticmethod
-    def get_campus_daily_apis(user):
-        if ActionBase.for_hainanu_server:
-            return {
-                'host': 'hainanu.campusphere.net',
-                'login-url': 'https://authserver.hainanu.edu.cn/authserver/login?service=https%3A%2F%2Fhainanu.campusphere.net%2Fportal%2Flogin'
-            }
+    def get_campus_daily_apis(self, user):
+        apis = {}
+        schools = requests.get(url='https://www.cpdaily.com/v6/config/guest/tenant/list').json()['data']
+        flag = True
+        if self.school_token:
+            user['school'] = self.school_token
+
+        for one in schools:
+            if one['name'] == user['school']:
+                if one['joinType'] == 'NONE':
+                    self.log(user['school'] + ' 未加入今日校园')
+                    return False
+                flag = False
+                params = {'ids': one['id']}
+                res = requests.get(url='https://www.cpdaily.com/v6/config/guest/tenant/info', params=params, )
+                data = res.json()['data'][0]
+                joinType = data['joinType']
+                idsUrl = data['idsUrl']
+                target_url = data['ampUrl'] if 'campusphere' in data['ampUrl'] or 'cpdaily' in data['ampUrl'] else data[
+                    'ampUrl2']
+                parse = urlparse(target_url)
+                host = parse.netloc
+                res = requests.get(parse.scheme + '://' + host)
+                parse = urlparse(res.url)
+                apis[
+                    'login-url'] = idsUrl + '/login?service=' + parse.scheme + r"%3A%2F%2F" + host + r'%2Fportal%2Flogin'
+                apis['host'] = host
+                break
+        if flag:
+            self.log(user['school'] + ' 未找到该院校信息，请检查是否是学校全称错误')
+            return False
+        # self.log(apis)
+        return apis
 
     # 登陆并获取session
-    @staticmethod
-    def get_session(user, apis):
+    def get_session(self, user, apis, retry=0, use_proxy=False, delay=10, max_retry_num=100):
+        if retry >= 3:
+            return False
         params = {
-            'login_url': apis['login-url'],
+            'login_url': self.login_url,
             'needcaptcha_url': '',
             'captcha_url': '',
             'username': user['username'],
             'password': user['password']
         }
-
         cookies = dict()
-        res = requests.post(url=LOGGING_API, data=params, verify=not DEBUG)
-        # cookieStr可以使用手动抓包获取到的cookie，有效期暂时未知，请自己测试
-        # cookieStr = str(res.json()['cookies'])
-        cookieStr = str(res.json()['cookies'])
-        ActionBase.log(cookieStr)
-        if cookieStr == 'None':
-            return None
+        try:
+            # fixme:统一认证接口抽风，原因未知，故当前版本不启用proxy方案
+            if use_proxy:
+                proxies = {
+                    'http': ProxyGenerator().run()['http']
+                }
+                res = requests.post(url=LOGGING_API, data=params, proxies=proxies)
+            else:
+                res = requests.post(url=LOGGING_API, data=params, )
 
-        # 解析cookie
-        for line in cookieStr.split(';'):
-            name, value = line.strip().split('=', 1)
-            cookies[name] = value
-        session = requests.session()
-        session.cookies = requests.utils.cookiejar_from_dict(cookies, cookiejar=None, overwrite=True)
-        return session
+            res.raise_for_status()
+            if res.status_code == 200:
+                cookieStr = str(res.json()['cookies'])
+                self.log(cookieStr)
+
+                if cookieStr == 'None':
+                    return None
+
+                # 解析cookie
+                for line in cookieStr.split(';'):
+                    name, value = line.strip().split('=', 1)
+                    cookies[name] = value
+                session = requests.session()
+                session.cookies = requests.utils.cookiejar_from_dict(cookies, cookiejar=None, overwrite=True)
+                return session
+        except RequestException:
+            retry += 1
+            self.get_session(user, apis, retry)
 
     # 获取最新未签到任务
-    @staticmethod
-    def get_unsigned_tasks(session, apis):
+    def get_unsigned_tasks(self, session, apis=None):
+        if not apis:
+            apis = self.apis
         headers = {
             'Accept': 'application/json, text/plain, */*',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
@@ -69,36 +121,32 @@ class ActionBase(object):
         res = session.post(
             url='https://{host}/wec-counselor-sign-apps/stu/sign/queryDailySginTasks'.format(host=apis['host']),
             headers=headers, data=json.dumps({}), verify=not DEBUG)
-
-        # 第二次请求每日签到任务接口，拿到具体的签到任务
-        res = session.post(
-            url='https://{host}/wec-counselor-sign-apps/stu/sign/queryDailySginTasks'.format(host=apis['host']),
-            headers=headers, data=json.dumps({}), verify=not DEBUG)
-
-        # fixme:debug module-- response status code :404
+        # fixme:DEBUG module-- response status code :404
         try:
-            if len(res.json()['datas']['unSignedTasks']) < 1:
-                pass
+            latestTask = res.json()['datas']['unSignedTasks'][0]
+            return {
+                'signInstanceWid': latestTask['signInstanceWid'],
+                'signWid': latestTask['signWid']
+            }
         except json.decoder.JSONDecodeError:
-            ActionBase.log(
+            self.error_msg = self.log(
                 f'the response of queryClass is None! ({res.status_code})|| Base on function(get_unsigned_tasks)')
             try:
-                if res.status_code != 200:
-                    ActionBase.log('the status code of response is ({})'.format(res.status_code))
-                ActionBase.log('当前没有未签到任务')
+                if res.status_code == 200:
+                    self.log('the status code of response is ({})'.format(res.status_code))
+                    self.log('当前没有未签到任务')
             finally:
                 return None
-
-        latestTask = res.json()['datas']['unSignedTasks'][0]
-
-        return {
-            'signInstanceWid': latestTask['signInstanceWid'],
-            'signWid': latestTask['signWid']
-        }
+        except IndexError:
+            # self.log("[FAILED] 签到-- {} || 该学院本阶段打卡任务为空 ({}) ".format(
+            #     self.user_info['username'],
+            #     res.json()['datas']['signedTasks'][0]['senderUserName']))
+            return None
 
     # 获取签到任务详情
-    @staticmethod
-    def get_detail_task(session, params, apis):
+    def get_detail_task(self, session, params, apis=None):
+        if not apis:
+            apis = self.apis
         headers = {
             'Accept': 'application/json, text/plain, */*',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
@@ -111,32 +159,74 @@ class ActionBase(object):
             url='https://{host}/wec-counselor-sign-apps/stu/sign/detailSignTaskInst'.format(host=apis['host']),
             headers=headers, data=json.dumps(params), verify=not DEBUG)
         data = res.json()['datas']
+
         return data
 
     # 填充表单
-    @staticmethod
-    def fill_form(task: dict, session, user, apis, ):
+    def fill_form(self, task: dict, session, user, apis, ):
+        user = user['user']
         form = {
+            'signPhotoUrl': '',
             'longitude': LONGITUDE,
             'latitude': LATITUDE,
             'position': ADDRESS,
             'abnormalReason': ABNORMAL_REASON,
         }
-
-        if ActionBase.for_hainanu_server:
-            extraFields = task.get('extraField')
-            if extraFields and extraFields.__len__() == 1:
-                question = extraFields[0].get('title')
-                answer = QnA[question]
-                extraFieldItems = extraFields[0]['extraFieldItems']
+        if task['isNeedExtra'] == 1:
+            extraFields = task['extraField']
+            questions = list(QnA.keys())
+            extraFieldItemValues = []
+            for i in range(0, len(extraFields)):
+                question = questions[i]
+                extraField = extraFields[i]
+                extraFieldItems = extraField['extraFieldItems']
                 for extraFieldItem in extraFieldItems:
-                    if extraFieldItem['content'] == answer:
-                        form['extraFieldItems'] = [{'extraFieldItemValue': answer,
-                                                    'extraFieldItemWid': extraFieldItem['wid']}]
-        form['signPhotoUrl'] = ''
+                    if extraFieldItem['content'] == question:
+                        extraFieldItemValue = {'extraFieldItemValue': QnA[question],
+                                               'extraFieldItemWid': extraFieldItem['wid']}
+                        # # 其他，额外文本
+                        # if extraFieldItem['isOtherItems'] == 1:
+                        #     extraFieldItemValue = {'extraFieldItemValue': question['other'],
+                        #                            'extraFieldItemWid': extraFieldItem['wid']}
+                        extraFieldItemValues.append(extraFieldItemValue)
+            # log(extraFieldItemValues)
+            # 处理带附加选项的签到
+            form['extraFieldItems'] = extraFieldItemValues
         form['signInstanceWid'] = task['signInstanceWid']
         form['isMalposition'] = task['isMalposition']
         return form
+
+    @staticmethod
+    def upload_picture(session, image, apis):
+        import oss2
+        url = 'https://{host}/wec-counselor-sign-apps/stu/sign/getStsAccess'.format(host=apis['host'])
+        res = session.post(url=url, headers={'content-type': 'application/json'}, data=json.dumps({}), verify=not DEBUG)
+        data = res.json().get('datas')
+        fileName = data.get('fileName')
+        accessKeyId = data.get('accessKeyId')
+        accessSecret = data.get('accessKeySecret')
+        securityToken = data.get('securityToken')
+        endPoint = data.get('endPoint')
+        bucket = data.get('bucket')
+        bucket = oss2.Bucket(oss2.Auth(access_key_id=accessKeyId, access_key_secret=accessSecret), endPoint, bucket)
+        with open(image, "rb") as f:
+            data = f.read()
+        bucket.put_object(key=fileName, headers={'x-oss-security-token_msg': securityToken}, data=data)
+        res = bucket.sign_url('PUT', fileName, 60)
+        # log(res)
+        return fileName
+
+    # 获取图片上传位置
+    @staticmethod
+    def get_picture_url(session, fileName, apis):
+        url = 'https://{host}/wec-counselor-sign-apps/stu/sign/previewAttachment'.format(host=apis['host'])
+        data = {
+            'ossKey': fileName
+        }
+        res = session.post(url=url, headers={'content-type': 'application/json'}, data=json.dumps(data),
+                           verify=not DEBUG)
+        photoUrl = res.json().get('datas')
+        return photoUrl
 
     # DES加密
     @staticmethod
@@ -148,8 +238,9 @@ class ActionBase(object):
         return base64.b64encode(encrypt_str).decode()
 
     # 提交签到任务
-    @staticmethod
-    def submitForm(session, user, form, apis):
+    def submitForm(self, session, user, form, apis=None):
+        if not apis:
+            apis = self.apis
         # campus daily Extension
         extension = {
             "lon": LONGITUDE,
@@ -167,7 +258,7 @@ class ActionBase(object):
             'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; OPPO R11 Plus Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 okhttp/3.12.4',
             'CpdailyStandAlone': '0',
             'extension': '1',
-            'Cpdaily-Extension': ActionBase.DESEncrypt(json.dumps(extension)),
+            'Cpdaily-Extension': self.DESEncrypt(json.dumps(extension)),
             'Content-Type': 'application/json; charset=utf-8',
             'Accept-Encoding': 'gzip',
             # 'Host': 'swu.cpdaily.com',
@@ -178,19 +269,30 @@ class ActionBase(object):
             headers=headers, data=json.dumps(form), verify=not DEBUG)
         message = res.json()['message']
         if message == 'SUCCESS':
-            ActionBase.log('自动签到成功')
-            send_email('自动签到成功', user['email'])
+            self.log('[SUCCESS] 签到 -- {}'.format(user['username']))
         else:
-            ActionBase.log('自动签到失败，原因是：' + message)
-            send_email('自动签到失败，原因是:' + message, user['email'])
-            return False
+            self.log('[FAILED] 签到-- {} || {}'.format(user['username'], message))
+        return message
 
     @staticmethod
     def send_email(msg, to):
-        send_email(msg, to)
+        response = send_email(msg, to)
+        return response
 
-    @staticmethod
     # 打印调试信息
-    def log(content):
-        if not ActionBase.silence:
-            print('>>> {} {}'.format(str(datetime.now(TIME_ZONE_CN)).split('.')[0], content))
+    def log(self, content):
+        msg_ = '>>> {} || {}'.format(str(datetime.now(TIME_ZONE_CN)).split('.')[0], content)
+        if not self.silence:
+            print(msg_)
+            return msg_
+
+
+class NoCloudAction(object):
+    """当教务502时的备用方案"""
+
+    def __init__(self):
+        pass
+
+
+if __name__ == '__main__':
+    print(ActionBase().get_campus_daily_apis({'school': '海南大学'}))
