@@ -1,0 +1,65 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: auto-sign
+
+on:
+  push:
+    branches: [ master ]
+  schedule:
+    - cron: 30,0,57,27 16 * * *
+ # watch:
+ #   types: started
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+        TZ: Asia/Shanghai
+    
+    steps:
+  
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Setup Java JRE
+      uses: actions/setup-java@v1.4.3
+      with:
+         java-version: 1.8
+         java-package: jre
+    - name: Get pip cache dir
+      id: pip-cache
+      run: |
+       echo "::set-output name=dir::$(pip cache dir)"
+
+    - name: pip cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache.outputs.dir }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Prepare the jobs
+      run: |
+        sudo apt install tesseract-ocr tesseract-ocr-chi-sim
+        sudo apt install tesseract-ocr-eng
+        curl -L -v -o temp.jar https://github.com/ZimoLoveShuang/wisedu-unified-login-api/releases/download/v1.0.8/wisedu-unified-login-api-v1.0.jar
+        ls
+        pwd
+        java -version
+        (java -jar ./temp.jar &)
+        python3 -m pip install --upgrade pip
+        pip install setuptools flake8 wheel
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Run with schedule.
+      run: |
+        python3 index.py

@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 from urllib3.exceptions import InsecureRequestWarning
 
 # debug模式
-debug = False
+debug = True
 if debug:
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -104,11 +104,16 @@ def getSession(user, apis):
 
     cookies = {}
     # 借助上一个项目开放出来的登陆API，模拟登陆
-    res = requests.post(url=config['login']['api'], data=params, verify=not debug)
+    res = ''
+    try:
+        res = requests.post(url=config['login']['api'], data=params, verify=not debug)
+    except Exception as e:
+        res = requests.post(url='http://127.0.0.1:8080/wisedu-unified-login-api-v1.0/api/login', data=params, verify=not debug)
+    
     # cookieStr可以使用手动抓包获取到的cookie，有效期暂时未知，请自己测试
     # cookieStr = str(res.json()['cookies'])
     cookieStr = str(res.json()['cookies'])
-    log(cookieStr)
+    # log(cookieStr) 调试时再输出
     if cookieStr == 'None':
         log(res.json())
         exit(-1)
@@ -123,8 +128,8 @@ def getSession(user, apis):
     return session
 
 
-# 获取最新未签到任务
-def getUnSignedTasks(session, apis):
+# 获取最新未签到任务并全部签到
+def getUnSignedTasksAndSign(session, apis, user):
     headers = {
         'Accept': 'application/json, text/plain, */*',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
@@ -145,11 +150,18 @@ def getUnSignedTasks(session, apis):
         log('当前没有未签到任务')
         exit(-1)
     # log(res.json())
-    latestTask = res.json()['datas']['unSignedTasks'][0]
-    return {
-        'signInstanceWid': latestTask['signInstanceWid'],
-        'signWid': latestTask['signWid']
-    }
+    for i in range(0, len(res.json()['datas']['unSignedTasks'])):
+       #if '出校' in res.json()['datas']['unSignedTasks'][i]['taskName'] == False:
+        # if '入校' in res.json()['datas']['unSignedTasks'][i]['taskName'] == False:
+            latestTask = res.json()['datas']['unSignedTasks'][i]
+            params = {
+              'signInstanceWid': latestTask['signInstanceWid'],
+              'signWid': latestTask['signWid']
+            }
+            task = getDetailTask(session, params, apis)
+            form = fillForm(task, session, user, apis)
+            
+            submitForm(session, user, form, apis)
 
 
 # 获取签到任务详情
@@ -259,7 +271,7 @@ def submitForm(session, user, form, apis):
         "lon": user['lon'],
         "model": "OPPO R11 Plus",
         "appVersion": "8.1.14",
-        "systemVersion": "4.4.4",
+        "systemVersion": "8.0",
         "userId": user['username'],
         "systemName": "android",
         "lat": user['lat'],
@@ -292,16 +304,25 @@ def submitForm(session, user, form, apis):
 # 发送邮件通知
 def sendMessage(msg, email):
     send = email
-    if send != '':
-        log('正在发送邮件通知。。。')
-        res = requests.post(url='http://www.zimo.wiki:8080/mail-sender/sendMail',
-                            data={'title': '今日校园自动签到结果通知', 'content': msg, 'to': send}, verify=not debug)
-        code = res.json()['code']
-        if code == 0:
-            log('发送邮件通知成功。。。')
-        else:
-            log('发送邮件通知失败。。。')
-            log(res.json())
+    if msg.count("未开始")>0:
+        return ''
+    try:
+        if send != '':
+                log('正在发送邮件通知。。。')
+                log(getTimeStr())
+ #               sendMessageWeChat(msg + getTimeStr(), '今日校园自动签到结果通知')
+    
+                res = requests.post(url='http://www.zimo.wiki:8080/mail-sender/sendMail',
+                            data={'title': '今日校园自动签到结果通知' + getTimeStr(), 'content': msg, 'to': send}, verify=not debug)
+                code = res.json()['code']
+                if code == 0:
+                    log('发送邮件通知成功。。。')
+                else:
+                    log('发送邮件通知失败。。。')
+                log(res.json())
+    except Exception as e:
+        log("send failed")
+
 
 
 # 主函数
@@ -309,11 +330,7 @@ def main():
     for user in config['users']:
         apis = getCpdailyApis(user)
         session = getSession(user, apis)
-        params = getUnSignedTasks(session, apis)
-        task = getDetailTask(session, params, apis)
-        form = fillForm(task, session, user, apis)
-        # form = getDetailTask(session, user, params, apis)
-        submitForm(session, user, form, apis)
+        getUnSignedTasksAndSign(session, apis, user)
 
 
 # 提供给腾讯云函数调用的启动函数
