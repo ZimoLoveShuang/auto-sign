@@ -10,6 +10,7 @@ from pyDes import des, CBC, PAD_PKCS5
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlparse
 from urllib3.exceptions import InsecureRequestWarning
+from decimal import Decimal
 
 # debug模式
 debug = True
@@ -284,24 +285,24 @@ def submitForm(session, user, form, apis):
     user = user['user']
     # Cpdaily-Extension
     extension = {
-        "lon": user['lon'],
-        "model": "OPPO R11 Plus",
-        "appVersion": "8.1.14",
-        "systemVersion": "8.0",
+        "lon": Decimal(user['lon']),
+        "model": "NOH-AN00",
+        "appVersion": "8.2.12",
+        "systemVersion": "10.0.0",
         "userId": user['username'],
         "systemName": "android",
-        "lat": user['lat'],
+        "lat": Decimal(user['lat']),
         "deviceId": str(uuid.uuid1())
     }
 
     headers = {
         # 'tenantId': '1019318364515869',
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; OPPO R11 Plus Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 okhttp/3.12.4',
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 10.0.0; NOH-AN00 Build/NZH54D) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/81.0.4044.117 Safari/537.36 cpdaily/8.2.12 wisedu/8.2.12',
         'CpdailyStandAlone': '0',
         'extension': '1',
         'Cpdaily-Extension': DESEncrypt(json.dumps(extension)),
         'Content-Type': 'application/json; charset=utf-8',
-        'Accept-Encoding': 'gzip',
+        'Accept-Encoding': 'gzip, deflate',
         # 'Host': 'swu.cpdaily.com',
         'Connection': 'Keep-Alive'
     }
