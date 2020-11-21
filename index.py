@@ -86,7 +86,7 @@ def getCpdailyApis(user):
     if flag:
         log(user['school'] + ' 未找到该院校信息，请检查是否是学校全称错误')
         exit(-1)
-    log(apis)
+   # log(apis)
     return apis
 
 
@@ -151,6 +151,7 @@ def getUnSignedTasksAndSign(session, apis, user):
         exit(-1)
     # log(res.json())
     for i in range(0, len(res.json()['datas']['unSignedTasks'])):
+      # 如果需要过滤特定关键字，请在下面这里加判断
        #if '出校' in res.json()['datas']['unSignedTasks'][i]['taskName'] == False:
         # if '入校' in res.json()['datas']['unSignedTasks'][i]['taskName'] == False:
             latestTask = res.json()['datas']['unSignedTasks'][i]
@@ -222,25 +223,40 @@ def fillForm(task, session, user, apis):
     form['position'] = user['address']
     return form
 
-
-# 上传图片到阿里云oss
+# 11/2020 的 新上传API credit to @mrjesen
 def uploadPicture(session, image, apis):
-    url = 'https://{host}/wec-counselor-sign-apps/stu/sign/getStsAccess'.format(host=apis['host'])
-    res = session.post(url=url, headers={'content-type': 'application/json'}, data=json.dumps({}), verify=not debug)
+    url = 'https://{host}/wec-counselor-sign-apps/stu/oss/getUploadPolicy'.format(host=apis['host'])
+    res = session.post(url=url, headers={'content-type': 'application/json'}, data=json.dumps({'fileType':1}), verify=not debug)
     datas = res.json().get('datas')
-    fileName = datas.get('fileName')
-    accessKeyId = datas.get('accessKeyId')
-    accessSecret = datas.get('accessKeySecret')
-    securityToken = datas.get('securityToken')
-    endPoint = datas.get('endPoint')
-    bucket = datas.get('bucket')
-    bucket = oss2.Bucket(oss2.Auth(access_key_id=accessKeyId, access_key_secret=accessSecret), endPoint, bucket)
-    with open(image, "rb") as f:
-        data = f.read()
-    bucket.put_object(key=fileName, headers={'x-oss-security-token': securityToken}, data=data)
-    res = bucket.sign_url('PUT', fileName, 60)
+    #log(datas)
+    #new_api_upload
+    fileName = datas.get('fileName') + '.png'
+    accessKeyId = datas.get('accessid')
+    xhost = datas.get('host')
+    xdir = datas.get('dir')
+    xpolicy = datas.get('policy')
+    signature = datas.get('signature')
+    #new_api_upload
+    #new_api_upload2
+    url = xhost + '/'
+    data={
+        'key':fileName,
+        'policy':xpolicy,
+        'OSSAccessKeyId':accessKeyId,
+        'success_action_status':'200',
+        'signature':signature
+    }
+    data_file = {
+        'file':('blob',open(image,'rb'),'image/jpg')
+    }
+    res = session.post(url=url,data=data,files=data_file)
+    if(res.status_code == requests.codes.ok):
+        log('图片上传成功! ')
+        return fileName
+    
+    #new_api_upload2
     # log(res)
-    return fileName
+    return ''
 
 
 # 获取图片上传位置
@@ -298,7 +314,8 @@ def submitForm(session, user, form, apis):
     else:
         log('自动签到失败，原因是：' + message)
         # sendMessage('自动签到失败，原因是：' + message, user['email'])
-        exit(-1)
+        # 这里先注释掉，因为碰到时间没到的会断签
+        # exit(-1)
 
 
 # 发送邮件通知
