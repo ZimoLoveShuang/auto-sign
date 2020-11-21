@@ -43,7 +43,7 @@ jobs:
           ${{ runner.os }}-pip-
     - name: Prepare the jobs
       env:
-        IMAGE_BASE64: ${{ secrets.IMAGE }}
+        IMAGE: ${{ secrets.IMAGE }}
         CONFIG: ${{ secrets.CONFIG }}
       run: |
         sudo apt install tesseract-ocr tesseract-ocr-chi-sim
@@ -52,8 +52,8 @@ jobs:
         curl -L -v -o temp.jar https://github.com/ZimoLoveShuang/wisedu-unified-login-api/releases/download/v1.0.8/wisedu-unified-login-api-v1.0.jar
         
         rm config.yml default.png
-        echo ${IMAGE_BASE64}
-        base64 -d <<< ${IMAGE_BASE64} > default.jpg
+        echo ${IMAGE}
+        base64 -d <<< ${IMAGE} > default.jpg
         echo ${CONFIG} > config.yml 
         
         ls
