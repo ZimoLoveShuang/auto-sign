@@ -12,6 +12,9 @@ from urllib.parse import urlparse
 from urllib3.exceptions import InsecureRequestWarning
 from decimal import Decimal
 
+#Key For ServerChan
+key=''
+
 # debug模式
 debug = True
 if debug:
@@ -328,7 +331,7 @@ def sendMessage(msg, email):
         if send != '':
                 log('正在发送邮件通知。。。')
                 log(getTimeStr())
- #               sendMessageWeChat(msg + getTimeStr(), '今日校园自动签到结果通知')
+                sendMessageWeChat(msg + getTimeStr(), '今日校园自动签到结果通知')
     
                 res = requests.post(url='http://www.zimo.wiki:8080/mail-sender/sendMail',
                             data={'title': '今日校园自动签到结果通知' + getTimeStr(), 'content': msg, 'to': send}, verify=not debug)
@@ -341,7 +344,11 @@ def sendMessage(msg, email):
     except Exception as e:
         log("send failed")
 
-
+def sendMessageWeChat(msg, desp):
+    if len(key) < 1:
+        return
+    url = 'https://sc.ftqq.com/' + key + '.send?text=' + msg + '&desp=' + desp;
+    requests.get(url, verify=False)
 
 # 主函数
 def main():
