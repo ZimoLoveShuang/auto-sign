@@ -52,6 +52,7 @@ jobs:
         curl -L -v -o temp.jar https://github.com/ZimoLoveShuang/wisedu-unified-login-api/releases/download/v1.0.8/wisedu-unified-login-api-v1.0.jar
         
         rm config.yml default.png
+        echo ${IMAGE}
         echo ${IMAGE} | base64 -d > default.png
         echo ${CONFIG} > config.yml
         
