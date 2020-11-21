@@ -4,6 +4,7 @@
     </h1>
   </div>
 
+## 这是什么 ？
 
 受人之托，写的今日校园自动签到脚本，可能已经通用了在今日校园签到的所有学校了
 * [x] 图片签到
@@ -22,10 +23,10 @@
 
 ## Actions 方式
 
-1. **先 Fork 本项目**
-2. **配置好自己的config.yml和default.png[如不需要图片,请自行修改actions脚本]**
-3. **将上面两个文件分别转为Base64,可使用[这个网站](https://www.hitoy.org/tool/file_base64.php)**
-4. **进入项目 Settings -> Secrets -> New repository secret 添加以下 2 个 Secrets。**
+1. 先 Fork 本项目
+2. 配置好自己的config.yml和default.png[**如不需要图片,请自行修改actions脚本**]
+3. 将上面两个文件分别转为Base64,可使用[这个网站](https://www.hitoy.org/tool/file_base64.php)
+4. 进入项目 **Settings -> Secrets** 后 点击**New repository secret**按钮 依次添加以下 2 个 Secrets。
 
 | Name       | Value               |
 | ---------- | ------------------  |
@@ -33,18 +34,21 @@
 | IMAGE      | default.png的Base64 |
 
 
-5. **修改.github/trigger内的内容为on(随便创建一个文件也可以)**
-6. **检查能否正常签到**
+5. 修改.github/trigger内的内容为on(随便创建一个文件也可以)
+6. 检查能否**正常**签到
 
-
-
-## Config.yml的 配置方式
- **如果你不会配置表单组默认选项配置，请下载本项目到本地输入pip install -r requirements.txt后配置好Config.yml内的user部分的信息之后本地执行generate.py然后将分割线下的内容复制到配置文件中对应位置,如果不知道怎么配置经纬度信息可以访问[这里](http://zuobiao.ay800.com/s/27/index.php)，将经纬度四舍五入保留[六位小数]之后的放入配置文件对应位置即可**
 
 
 
 ## 云函数方式
- **请参考[auto-submit项目](https://github.com/ZimoLoveShuang/auto-submit)如遇到依赖问题，请去[`auto-sumit`](https://github.com/ZimoLoveShuang/auto-submit)项目下载`dependency.zip`，然后参考`auto-submit`项目的说明将函数依赖层添加到腾讯云函数, 如果一天签到多次，除了问题不一样之外，其他都一样，你又不想配置多个云函数的话，配置文件设置不检查就行了**
+ 请参考[auto-submit项目](https://github.com/ZimoLoveShuang/auto-submit)如遇到依赖问题，请去[`auto-sumit`](https://github.com/ZimoLoveShuang/auto-submit)项目下载`dependency.zip`，然后参考`auto-submit`项目的说明将函数依赖层添加到腾讯云函数, 如果一天签到多次，除了问题不一样之外，其他都一样，你又不想配置多个云函数的话，配置文件设置不检查就行了
+ 
+ 
+ 
+
+## Config.yml的 配置方式
+ 如果你不会配置表单组默认选项配置，请下载本项目到本地输入pip install -r requirements.txt后配置好Config.yml内的user部分的信息之后本地执行generate.py然后将分割线下的内容复制到配置文件中对应位置,如果不知道怎么配置经纬度信息可以访问[这里](http://zuobiao.ay800.com/s/27/index.php)，将经纬度**四舍五入保留六位小数**之后的放入配置文件对应位置即可
+
 
 
 
