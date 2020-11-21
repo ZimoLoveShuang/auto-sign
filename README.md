@@ -47,7 +47,7 @@
  
 
 ## Config.yml的 配置方式
- 如果你不会配置表单组默认选项配置，请下载本项目到本地输入pip install -r requirements.txt后配置好Config.yml内的user部分的信息之后本地执行generate.py然后将分割线下的内容复制到配置文件中对应位置,如果不知道怎么配置经纬度信息可以访问[这里](http://zuobiao.ay800.com/s/27/index.php)，将经纬度**四舍五入保留六位小数**之后的放入配置文件对应位置即可
+ 如果你不会配置表单组默认选项配置，请下载本项目到本地输入`pip install -r requirements.txt`后配置好Config.yml内的user部分的信息之后本地执行`generate.py`然后将分割线下的内容复制到配置文件中对应位置,如果不知道怎么配置经纬度信息可以访问[这里](http://zuobiao.ay800.com/s/27/index.php)，将经纬度**四舍五入保留六位小数**之后的放入配置文件对应位置即可
 
 
 
