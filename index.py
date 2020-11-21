@@ -338,6 +338,15 @@ def sendMessage(msg, email):
                 log(getTimeStr())
                 sendMessageWeChat(msg + getTimeStr(), '今日校园自动签到结果通知')
     
+    
+               '''     requests.post(
+                         "https://api.mailgun.net/v3/YOUR_DOMAIN_NAME/messages",
+                        auth=("api", "YOUR_API_KEY"),
+                        data={"from": "Excited User <mailgun@YOUR_DOMAIN_NAME>",
+                              "to": ["bar@example.com", "YOU@YOUR_DOMAIN_NAME"],
+                              "subject": "Hello",
+                              "text": "Testing some Mailgun awesomness!"})
+               '''
                 res = requests.post(url='http://www.zimo.wiki:8080/mail-sender/sendMail',
                             data={'title': '今日校园自动签到结果通知' + getTimeStr(), 'content': msg, 'to': send}, verify=not debug)
                 code = res.json()['code']
