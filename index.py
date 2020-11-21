@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 from urllib3.exceptions import InsecureRequestWarning
 from decimal import Decimal
 
-#Key For ServerChan
+# Key For ServerChan
 key=''
 
 # debug模式
@@ -220,8 +220,8 @@ def fillForm(task, session, user, apis):
         form['extraFieldItems'] = extraFieldItemValues
     # form['signInstanceWid'] = params['signInstanceWid']
     form['signInstanceWid'] = task['signInstanceWid']
-    form['longitude'] = user['lon']
-    form['latitude'] = user['lat']
+    form['longitude'] = Decimal(user['lon'])
+    form['latitude'] = Decimal(user['lat'])
     form['isMalposition'] = task['isMalposition']
     form['abnormalReason'] = user['abnormalReason']
     form['position'] = user['address']
