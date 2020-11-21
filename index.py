@@ -20,6 +20,11 @@ debug = True
 if debug:
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, Decimal):
+            return float(o)
+        super(DecimalEncoder, self).default(o)
 
 # 读取yml配置
 def getYmlConfig(yaml_file='config.yml'):
@@ -303,14 +308,14 @@ def submitForm(session, user, form, apis):
         'User-Agent': 'Mozilla/5.0 (Linux; Android 10.0.0; NOH-AN00 Build/NZH54D) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/81.0.4044.117 Safari/537.36 cpdaily/8.2.12 wisedu/8.2.12',
         'CpdailyStandAlone': '0',
         'extension': '1',
-        'Cpdaily-Extension': DESEncrypt(json.dumps(extension)),
+        'Cpdaily-Extension': DESEncrypt(json.dumps(extension, cls=DecimalEncoder)),
         'Content-Type': 'application/json; charset=utf-8',
         'Accept-Encoding': 'gzip, deflate',
         # 'Host': 'swu.cpdaily.com',
         'Connection': 'Keep-Alive'
     }
     res = session.post(url='https://{host}/wec-counselor-sign-apps/stu/sign/completeSignIn'.format(host=apis['host']),
-                       headers=headers, data=json.dumps(form), verify=not debug)
+                       headers=headers, data=json.dumps(form, cls=DecimalEncoder), verify=not debug)
     message = res.json()['message']
     if message == 'SUCCESS':
         log('自动签到成功')
