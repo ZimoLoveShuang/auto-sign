@@ -1,7 +1,8 @@
 <div align="center">
-<h1 align="center">
-今日校园辅导猫自动签到
-</h1>
+    <h1 align="center">
+      今日校园辅导猫自动签到
+    </h1>
+  </div>
 
 # 禁止任何人使用此项目提供付费的代挂服务
 
