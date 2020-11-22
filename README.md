@@ -58,3 +58,4 @@
 3. `Cpdaily-Extension`本质上就是对一个json对象进行了des加密，然后编码为了Base64字符串，加密解密实现可以参考[Java版](https://github.com/ZimoLoveShuang/yibinu-score-crawler/blob/master/src/main/java/wiki/zimo/scorecrawler/helper/DESHelper.java) [python版](https://github.com/ZimoLoveShuang/auto-submit/blob/master/currency/encrypt.py)
 4. 也欢迎其他学校学子在此提交适用于自己学校的配置，命名规则为`config_xxxx.yml`，`xxxx`为学校英文简称
 5. 如果需要针对特定签到任务的黑名单(如出入校等)，可自行修改代码
+6. 如果cookies一直为null请手动获取cookies并修改代码相应位置(参考[`auto-sumit`](https://github.com/ZimoLoveShuang/auto-submit)项目)
