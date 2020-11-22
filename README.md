@@ -33,9 +33,16 @@
 | CONFIG     | config.yml的Base64  |
 | IMAGE      | default.png的Base64 |
 
+5. 在你 Folk 的项目主页依次点击以下按钮
 
-5. 修改.github/trigger内的内容为on(随便创建一个文件也可以)
-6. 检查能否**正常**签到
+![图示](.github/workflows/Step.PNG)
+
+6. 继续以下操作开启Actions
+
+![图示](.github/workflows/Step2.PNG)
+
+7. 修改.github/trigger内的内容为on(随便创建一个文件也可以)
+8. 检查能否**正常**签到
 
 
 
