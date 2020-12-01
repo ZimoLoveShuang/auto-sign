@@ -7,7 +7,10 @@ import login
 from datetime import datetime, timedelta, timezone
 
 # 全局
-
+CPDAILY_USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 (4471302144)cpdaily/8.2.12 wisedu/8.2.12'
+MOBILE_USER_AGENT = CPDAILY_USER_AGENT
+#MOBILE_USER_AGENT = 'Mozilla/5.0 (Linux; Android 9; VTR-AL00 Build/HUAWEIVTR-AL00; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/79.0.3945.116 Mobile Safari/537.36 okhttp/3.12.4'
+DESKTOP_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'
 Cookies = {
     'acw_tc': '',
     'MOD_AUTH_CAS': '',
@@ -35,7 +38,8 @@ def restoreSessionFromYml(yaml_file='session.yml'):
     f.close()
     session_data = dict(yaml.load(file_data, Loader=yaml.FullLoader))
     Cookies = session_data["Cookies"]
-    CpdailyInfo = session_data["CpdailyInfo"]
+    # CpdailyInfo = session_data["CpdailyInfo"]
+    CpdailyInfo = login.CpdailyInfo
     sessionToken = session_data["sessionToken"]
 
     session.cookies = requests.utils.cookiejar_from_dict(Cookies)
@@ -65,7 +69,7 @@ def getUnSignedTasks():
         'Accept': 'application/json, text/plain, */*',
         'Origin': 'https://' + host,
         'X-Requested-With': 'XMLHttpRequest',
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 cpdaily/8.0.8 wisedu/8.0.8',
+        'User-Agent': CPDAILY_USER_AGENT,
         'Content-Type': 'application/json',
         'Accept-Encoding': 'gzip,deflate',
         'Accept-Language': 'zh-CN,en-US;q=0.8',
@@ -90,7 +94,7 @@ def getUnSignedTasks():
 def getDetailTask(params):
     headers = {
         'Accept': 'application/json, text/plain, */*',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
+        'User-Agent': DESKTOP_USER_AGENT,
         'content-type': 'application/json',
         'Accept-Encoding': 'gzip,deflate',
         'Accept-Language': 'zh-CN,en-US;q=0.8',
@@ -144,7 +148,8 @@ def fillForm(task):
 def submitForm(form):
     headers = {
         # 'tenantId': '1019318364515869',
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; OPPO R11 Plus Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 okhttp/3.12.4',
+        # 'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; OPPO R11 Plus Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 okhttp/3.12.4',
+        'User-Agent': MOBILE_USER_AGENT,
         'CpdailyStandAlone': '0',
         'extension': '1',
         'Cpdaily-Extension': CpdailyInfo,

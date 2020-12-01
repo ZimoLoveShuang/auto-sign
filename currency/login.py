@@ -84,7 +84,7 @@ def getYmlConfig(yaml_file='config.yml'):
 
 
 # DES加密
-def DESEncrypt(s, key='XCE927=='):
+def DESEncrypt(s, key='ST83=@XV'):
     iv = b"\x01\x02\x03\x04\x05\x06\x07\x08"
     k = des(key, CBC, iv, pad=None, padmode=PAD_PKCS5)
     encrypt_str = k.encrypt(s)
@@ -92,7 +92,7 @@ def DESEncrypt(s, key='XCE927=='):
 
 
 # DES解密
-def DESDecrypt(s, key='XCE927=='):
+def DESDecrypt(s, key='ST83=@XV'):
     s = base64.b64decode(s)
     iv = b"\x01\x02\x03\x04\x05\x06\x07\x08"
     k = des(key, CBC, iv, pad=None, padmode=PAD_PKCS5)
@@ -109,11 +109,11 @@ user = config['user']
 # Cpdaily-Extension
 extension = {
     "lon": user['lon'],
-    "model": "PCRT00",
-    "appVersion": "8.0.8",
-    "systemVersion": "4.4.4",
+    "model": "iPhone10,1",
+    "appVersion": "8.2.12",
+    "systemVersion": "13.3.1",
     "userId": user['username'],
-    "systemName": "android",
+    "systemName": "iOS",
     "lat": user['lat'],
     "deviceId": str(uuid.uuid1())
 }
