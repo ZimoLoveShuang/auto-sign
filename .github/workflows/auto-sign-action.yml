@@ -7,7 +7,7 @@ on:
   push:
     branches: [ master ]
   schedule:
-    - cron: 30,0,57,27 16 * * *
+    - cron: 30,0 */4 * * *
  # watch:
  #   types: started
 
@@ -34,7 +34,6 @@ jobs:
       id: pip-cache
       run: |
        echo "::set-output name=dir::$(pip cache dir)"
-
     - name: pip cache
       uses: actions/cache@v2
       with:
@@ -42,11 +41,21 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    - name: Prepare the jobs
+    - name: Prepare the jobs 
+      env:
+        IMAGE: ${{ secrets.IMAGE }}
+        CONFIG: ${{ secrets.CONFIG }}
       run: |
         sudo apt install tesseract-ocr tesseract-ocr-chi-sim
         sudo apt install tesseract-ocr-eng
-        curl -L -v -o temp.jar https://github.com/ZimoLoveShuang/wisedu-unified-login-api/releases/download/v1.0.8/wisedu-unified-login-api-v1.0.jar
+        
+        rm config.yml default.png
+        
+        curl -L -v -o temp.jar https://github.com/ZimoLoveShuang/wisedu-unified-login-api/releases/download/v1.0.11/wisedu-unified-login-api-v1.0.jar
+        
+        echo ${IMAGE} | base64 -d > default.png
+        echo ${CONFIG} | base64 -d > config.yml
+        
         ls
         pwd
         java -version
@@ -63,3 +72,6 @@ jobs:
     - name: Run with schedule.
       run: |
         python3 index.py
+    - name: Clean
+      run: |
+        rm config.yml default.png
