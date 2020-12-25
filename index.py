@@ -304,7 +304,7 @@ def submitForm(session, user, form, apis):
         # 'Host': 'swu.cpdaily.com',
         'Connection': 'Keep-Alive'
     }
-    res = session.post(url='https://{host}/wec-counselor-sign-apps/stu/sign/completeSignIn'.format(host=apis['host']),
+    res = session.post(url='https://{host}/wec-counselor-sign-apps/stu/sign/submitSign'.format(host=apis['host']),
                        headers=headers, data=json.dumps(form), verify=not debug)
     message = res.json()['message']
     if message == 'SUCCESS':
