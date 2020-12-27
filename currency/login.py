@@ -28,7 +28,7 @@ def log(content):
 # 获取今日校园api
 def getCpdailyApis(user, debug=False):
     apis = {}
-    schools = requests.get(url='https://www.cpdaily.com/v6/config/guest/tenant/list', verify=not debug).json()['data']
+    schools = requests.get(url='https://mobile.campushoy.com/v6/config/guest/tenant/list', verify=not debug).json()['data']
     flag = True
     for one in schools:
         if one['name'] == user['school']:
@@ -40,7 +40,7 @@ def getCpdailyApis(user, debug=False):
                 'ids': one['id']
             }
             apis['tenantId'] = one['id']
-            res = requests.get(url='https://www.cpdaily.com/v6/config/guest/tenant/info', params=params,
+            res = requests.get(url='https://mobile.campushoy.com/v6/config/guest/tenant/info', params=params,
                                verify=not debug)
             data = res.json()['data'][0]
             joinType = data['joinType']
@@ -110,7 +110,7 @@ user = config['user']
 extension = {
     "lon": user['lon'],
     "model": "iPhone10,1",
-    "appVersion": "8.2.12",
+    "appVersion": "8.2.14",
     "systemVersion": "13.3.1",
     "userId": user['username'],
     "systemName": "iOS",
@@ -133,22 +133,23 @@ def getMessageCode():
         'deviceType': '1',
         'CpdailyStandAlone': '0',
         'CpdailyInfo': CpdailyInfo,
-        'RetrofitHeader': '8.0.8',
+        'RetrofitHeader': '8.2.14',
         'Cache-Control': 'max-age=0',
         'Content-Type': 'application/json; charset=UTF-8',
-        'Host': 'www.cpdaily.com',
+        'Host': 'mobile.campushoy.com',
         'Connection': 'Keep-Alive',
         'Accept-Encoding': 'gzip',
     }
     params = {
         'mobile': DESEncrypt(str(user['tellphone']))
     }
-    url = 'https://www.cpdaily.com/v6/auth/authentication/mobile/messageCode'
+    url = 'https://mobile.campushoy.com/v6/auth/authentication/mobile/messageCode'
     res = session.post(url=url, headers=headers, data=json.dumps(params))
     errMsg = res.json()['errMsg']
     if errMsg != None:
         log(errMsg)
-        exit(-1)
+        log(res.json())
+        #exit(-1)
     log('获取验证码成功。。。')
 
 
@@ -163,10 +164,10 @@ def mobileLogin(code):
         'deviceType': '1',
         'CpdailyStandAlone': '0',
         'CpdailyInfo': CpdailyInfo,
-        'RetrofitHeader': '8.0.8',
+        'RetrofitHeader': '8.2.14',
         'Cache-Control': 'max-age=0',
         'Content-Type': 'application/json; charset=UTF-8',
-        'Host': 'www.cpdaily.com',
+        'Host': 'mobile.campushoy.com',
         'Connection': 'Keep-Alive',
         'Accept-Encoding': 'gzip',
     }
@@ -174,12 +175,12 @@ def mobileLogin(code):
         'loginToken': str(code),
         'loginId': str(user['tellphone'])
     }
-    url = 'https://www.cpdaily.com/v6/auth/authentication/mobileLogin'
+    url = 'https://mobile.campushoy.com/v6/auth/authentication/mobileLogin'
     res = session.post(url=url, headers=headers, data=json.dumps(params))
     errMsg = res.json()['errMsg']
     if errMsg != None:
         log(errMsg)
-        exit(-1)
+        # exit(-1)
     log('验证码验证成功。。。')
     return res.json()['data']
 
@@ -197,10 +198,10 @@ def validation(data):
         'deviceType': '1',
         'CpdailyStandAlone': '0',
         'CpdailyInfo': CpdailyInfo,
-        'RetrofitHeader': '8.0.8',
+        'RetrofitHeader': '8.2.14',
         'Cache-Control': 'max-age=0',
         'Content-Type': 'application/json; charset=UTF-8',
-        'Host': 'www.cpdaily.com',
+        'Host': 'mobile.campushoy.com',
         'Connection': 'Keep-Alive',
         'Accept-Encoding': 'gzip',
         'Cookie': 'sessionToken=' + sessionToken
@@ -208,7 +209,7 @@ def validation(data):
     params = {
         'tgc': DESEncrypt(tgc)
     }
-    url = 'https://www.cpdaily.com/v6/auth/authentication/validation'
+    url = 'https://mobile.campushoy.com/v6/auth/authentication/validation'
     res = session.post(url=url, headers=headers, data=json.dumps(params))
     errMsg = res.json()['errMsg']
     if errMsg != None:
@@ -243,7 +244,7 @@ def updateACwTc(data):
         'deviceType': '1',
         'CpdailyStandAlone': '0',
         'CpdailyInfo': CpdailyInfo,
-        'RetrofitHeader': '8.0.8',
+        'RetrofitHeader': '8.2.14',
         'Cache-Control': 'max-age=0',
         'Host': host,
         'Connection': 'Keep-Alive',
@@ -263,7 +264,7 @@ def getModAuthCas(data):
     headers = {
         'Host': host,
         'Connection': 'keep-alive',
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 cpdaily/8.0.8 wisedu/8.0.8',
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 cpdaily/8.2.14 wisedu/8.2.14',
         'Accept-Encoding': 'gzip,deflate',
         'Accept-Language': 'zh-CN,en-US;q=0.8',
         'X-Requested-With': 'com.wisedu.cpdaily'
@@ -274,10 +275,10 @@ def getModAuthCas(data):
     location = res.headers['location']
     # print(location)
     headers2 = {
-        'Host': 'www.cpdaily.com',
+        'Host': 'mobile.campushoy.com',
         'Connection': 'keep-alive',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 cpdaily/8.0.8 wisedu/8.0.8',
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 cpdaily/8.2.14 wisedu/8.2.14',
         'Accept-Encoding': 'gzip,deflate',
         'Accept-Language': 'zh-CN,en-US;q=0.8',
         'Cookie': 'clientType=cpdaily_student; tenantId=' + apis['tenantId'] + '; sessionToken=' + sessionToken,

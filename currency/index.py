@@ -7,7 +7,7 @@ import login
 from datetime import datetime, timedelta, timezone
 
 # 全局
-CPDAILY_USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 (4471302144)cpdaily/8.2.12 wisedu/8.2.12'
+CPDAILY_USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 (4471302144)cpdaily/8.2.14 wisedu/8.2.14'
 MOBILE_USER_AGENT = CPDAILY_USER_AGENT
 #MOBILE_USER_AGENT = 'Mozilla/5.0 (Linux; Android 9; VTR-AL00 Build/HUAWEIVTR-AL00; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/79.0.3945.116 Mobile Safari/537.36 okhttp/3.12.4'
 DESKTOP_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'
@@ -75,8 +75,8 @@ def getUnSignedTasks():
         'Accept-Language': 'zh-CN,en-US;q=0.8',
     }
     params = {}
-    # url = 'https://{host}/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay'.format(host=host)
-    url = 'https://{host}/wec-counselor-sign-apps/stu/sign/queryDailySginTasks'.format(host=host)
+    url = 'https://{host}/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay'.format(host=host)
+    # url = 'https://{host}/wec-counselor-sign-apps/stu/sign/queryDailySginTasks'.format(host=host)
     res = session.post(url=url, headers=headers, data=json.dumps(params))
     log(res.json())
     unSignedTasks = res.json()['datas']['unSignedTasks']
@@ -101,7 +101,7 @@ def getDetailTask(params):
         'Content-Type': 'application/json;charset=UTF-8'
     }
     res = session.post(
-        url='https://{host}/wec-counselor-sign-apps/stu/sign/detailSignTaskInst'.format(host=host),
+        url='https://{host}/wec-counselor-sign-apps/stu/sign/detailSignInstance'.format(host=host),
         headers=headers, data=json.dumps(params))
     print(host, res)
     data = res.json()['datas']
@@ -158,7 +158,7 @@ def submitForm(form):
         # 'Host': 'swu.cpdaily.com',
         'Connection': 'Keep-Alive'
     }
-    res = session.post(url='https://{host}/wec-counselor-sign-apps/stu/sign/completeSignIn'.format(host=host),
+    res = session.post(url='https://{host}/wec-counselor-sign-apps/stu/sign/submitSign'.format(host=host),
                        headers=headers, data=json.dumps(form))
     message = res.json()['message']
     if message == 'SUCCESS':
