@@ -7,7 +7,7 @@ on:
   push:
     branches: [master]
   schedule:
-    - cron: 10-30/5 12 * * * # Every 5 minutes, minutes 10 through 30 past the hour, between 12:00 and 12:59, every day
+    - cron: 10-30/5 4 * * * # Every 5 minutes, minutes 10 through 30 past the hour, between 04:00 and 04:59, every day
   # watch:
   #   types: started
 
