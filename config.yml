@@ -7,19 +7,19 @@ users:
   #单个用户配置
   - user:
       #username 学号或者工号
-      username: '161105024'
+      username: "123456789"
       #password 密码
-      password: '161105024'
+      password: "123456789"
       #address 地址，定位信息  中国河南省xx市xx区xx路
       address: 中国河南省
       #email 接受通知消息的邮箱
-      email: 461009747@qq.com
+      email: 1234567@qq.com
       #school 学校全称
       school: 新乡医学院
       #lon 经度
-      lon: '114.639377'
+      lon: "123.123456"
       #lat 纬度
-      lat: '32.958833'
+      lat: "123.123456"
       #abnormalReason 反馈信息
       abnormalReason: 在家
       #photo 签到照片，不需要可不填，或者直接删除
