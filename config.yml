@@ -12,8 +12,8 @@ users:
       password: "123456789"
       #address 地址，定位信息  中国河南省xx市xx区xx路
       address: 中国河南省
-      #email 接受通知消息的邮箱
-      email: 1234567@qq.com
+      #server_key Server 酱的SCKEY
+      server_key: xxxxxxxxxxxxxxxxxxx
       #school 学校全称
       school: 新乡医学院
       #lon 经度

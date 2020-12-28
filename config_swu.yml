@@ -12,8 +12,8 @@ users:
       password: "123456789"
       #address 地址，定位信息
       address: 中国重庆市北碚区文渊路
-      #email 接受通知消息的邮箱
-      email: xx@xx.com
+      #server_key Server 酱的SCKEY
+      server_key: xxxxxxxxxxxxx
       #school 学校全称
       school: 西南大学
       #lon 经度

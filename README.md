@@ -17,6 +17,8 @@
 
 ## 请参考[auto-submit项目](https://github.com/ZimoLoveShuang/auto-submit)
 
+#### Server 酱 SCKEY 获取地址 http://sc.ftqq.com/3.version
+
 #### 如果你不会配置表单组默认选项配置，请先配置好user信息之后本地执行generate.py然后将分割线下的内容复制到配置文件中对应位置
 
 #### 如遇到依赖问题，请去[`auto-sumit`](https://github.com/ZimoLoveShuang/auto-submit)项目下载`dependency.zip`，然后参考`auto-submit`项目的说明将函数依赖层添加到腾讯云函数

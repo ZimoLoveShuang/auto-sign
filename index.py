@@ -147,6 +147,7 @@ def getUnSignedTasksAndSign(session, apis, user):
         url='https://{host}/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay'.format(host=apis['host']),
         headers=headers, data=json.dumps({}), verify=not debug)
     if len(res.json()['datas']['unSignedTasks']) < 1:
+        sendMessage(msg="当前没有未签到任务",server_key=user["user"]["server_key"])
         log('当前没有未签到任务')
         exit(-1)
     # log(res.json())
@@ -294,31 +295,29 @@ def submitForm(session, user, form, apis):
     message = res.json()['message']
     if message == 'SUCCESS':
         log('自动签到成功')
-        sendMessage('自动签到成功', user['email'])
+        sendMessage('自动签到成功', user['server_key'])
     else:
         log('自动签到失败，原因是：' + message)
-        # sendMessage('自动签到失败，原因是：' + message, user['email'])
+        sendMessage('自动签到失败，原因是：' + message, user['server_key'])
         exit(-1)
 
 
-# 发送邮件通知
-def sendMessage(msg, email):
-    send = email
+# 发送通知
+def sendMessage(msg, server_key):
+    send = server_key
     if msg.count("未开始")>0:
         return ''
     try:
         if send != '':
-                log('正在发送邮件通知。。。')
+                log('正在发送通知。。。')
                 log(getTimeStr())
- #               sendMessageWeChat(msg + getTimeStr(), '今日校园自动签到结果通知')
-    
-                res = requests.post(url='http://www.zimo.wiki:8080/mail-sender/sendMail',
-                            data={'title': '今日校园自动签到结果通知' + getTimeStr(), 'content': msg, 'to': send}, verify=not debug)
-                code = res.json()['code']
-                if code == 0:
-                    log('发送邮件通知成功。。。')
+                res = requests.post(url='https://sc.ftqq.com/'+ send +'.send',
+                                    data={'text': '今日校园自动签到结果通知' + getTimeStr(), 'desp': msg})
+                code = res.status_code
+                if code == 200:
+                    log('发送通知成功。。。')
                 else:
-                    log('发送邮件通知失败。。。')
+                    log('发送通知失败。。。')
                 log(res.json())
     except Exception as e:
         log("send failed")
