@@ -47,7 +47,9 @@ def log(content):
 def getCpdailyApis(user):
     apis = {}
     user = user['user']
-    schools = requests.get(url='https://mobile.campushoy.com/v6/config/guest/tenant/list', verify=not debug).json()['data']
+    schools = requests.get(
+        url='https://mobile.campushoy.com/v6/config/guest/tenant/list',
+        verify=not debug).json()['data']
     flag = True
     for one in schools:
         if one['name'] == user['school']:
@@ -55,11 +57,11 @@ def getCpdailyApis(user):
                 log(user['school'] + ' 未加入今日校园')
                 exit(-1)
             flag = False
-            params = {
-                'ids': one['id']
-            }
-            res = requests.get(url='https://mobile.campushoy.com/v6/config/guest/tenant/info', params=params,
-                               verify=not debug)
+            params = {'ids': one['id']}
+            res = requests.get(
+                url='https://mobile.campushoy.com/v6/config/guest/tenant/info',
+                params=params,
+                verify=not debug)
             data = res.json()['data'][0]
             joinType = data['joinType']
             idsUrl = data['idsUrl']
@@ -106,10 +108,15 @@ def getSession(user, apis):
     # 借助上一个项目开放出来的登陆API，模拟登陆
     res = ''
     try:
-        res = requests.post(url=config['login']['api'], data=params, verify=not debug)
+        res = requests.post(url=config['login']['api'],
+                            data=params,
+                            verify=not debug)
     except Exception as e:
-        res = requests.post(url='http://127.0.0.1:8080/wisedu-unified-login-api-v1.0/api/login', data=params, verify=not debug)
-    
+        res = requests.post(
+            url='http://127.0.0.1:8080/wisedu-unified-login-api-v1.0/api/login',
+            data=params,
+            verify=not debug)
+
     # cookieStr可以使用手动抓包获取到的cookie，有效期暂时未知，请自己测试
     # cookieStr = str(res.json()['cookies'])
     cookieStr = str(res.json()['cookies'])
@@ -124,7 +131,9 @@ def getSession(user, apis):
         name, value = line.strip().split('=', 1)
         cookies[name] = value
     session = requests.session()
-    session.cookies = requests.utils.cookiejar_from_dict(cookies, cookiejar=None, overwrite=True)
+    session.cookies = requests.utils.cookiejar_from_dict(cookies,
+                                                         cookiejar=None,
+                                                         overwrite=True)
     return session
 
 
@@ -132,7 +141,8 @@ def getSession(user, apis):
 def getUnSignedTasksAndSign(session, apis, user):
     headers = {
         'Accept': 'application/json, text/plain, */*',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
+        'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
         'content-type': 'application/json',
         'Accept-Encoding': 'gzip,deflate',
         'Accept-Language': 'zh-CN,en-US;q=0.8',
@@ -140,44 +150,56 @@ def getUnSignedTasksAndSign(session, apis, user):
     }
     # 第一次请求每日签到任务接口，主要是为了获取MOD_AUTH_CAS
     res = session.post(
-        url='https://{host}/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay'.format(host=apis['host']),
-        headers=headers, data=json.dumps({}), verify=not debug)
+        url=
+        'https://{host}/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay'
+        .format(host=apis['host']),
+        headers=headers,
+        data=json.dumps({}),
+        verify=not debug)
     # 第二次请求每日签到任务接口，拿到具体的签到任务
     res = session.post(
-        url='https://{host}/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay'.format(host=apis['host']),
-        headers=headers, data=json.dumps({}), verify=not debug)
+        url=
+        'https://{host}/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay'
+        .format(host=apis['host']),
+        headers=headers,
+        data=json.dumps({}),
+        verify=not debug)
     if len(res.json()['datas']['unSignedTasks']) < 1:
-        sendMessage(msg="当前没有未签到任务",server_key=user["user"]["server_key"])
+        sendMessage(msg="当前没有未签到任务", server_key=user["user"]["server_key"])
         log('当前没有未签到任务')
         exit(-1)
     # log(res.json())
     for i in range(0, len(res.json()['datas']['unSignedTasks'])):
-       #if '出校' in res.json()['datas']['unSignedTasks'][i]['taskName'] == False:
+        #if '出校' in res.json()['datas']['unSignedTasks'][i]['taskName'] == False:
         # if '入校' in res.json()['datas']['unSignedTasks'][i]['taskName'] == False:
-            latestTask = res.json()['datas']['unSignedTasks'][i]
-            params = {
-              'signInstanceWid': latestTask['signInstanceWid'],
-              'signWid': latestTask['signWid']
-            }
-            task = getDetailTask(session, params, apis)
-            form = fillForm(task, session, user, apis)
-            
-            submitForm(session, user, form, apis)
+        latestTask = res.json()['datas']['unSignedTasks'][i]
+        params = {
+            'signInstanceWid': latestTask['signInstanceWid'],
+            'signWid': latestTask['signWid']
+        }
+        task = getDetailTask(session, params, apis)
+        form = fillForm(task, session, user, apis)
+
+        submitForm(session, user, form, apis)
 
 
 # 获取签到任务详情
 def getDetailTask(session, params, apis):
     headers = {
         'Accept': 'application/json, text/plain, */*',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
+        'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
         'content-type': 'application/json',
         'Accept-Encoding': 'gzip,deflate',
         'Accept-Language': 'zh-CN,en-US;q=0.8',
         'Content-Type': 'application/json;charset=UTF-8'
     }
     res = session.post(
-        url='https://{host}/wec-counselor-sign-apps/stu/sign/detailSignInstance'.format(host=apis['host']),
-        headers=headers, data=json.dumps(params), verify=not debug)
+        url='https://{host}/wec-counselor-sign-apps/stu/sign/detailSignInstance'
+        .format(host=apis['host']),
+        headers=headers,
+        data=json.dumps(params),
+        verify=not debug)
     data = res.json()['datas']
     return data
 
@@ -198,18 +220,23 @@ def fillForm(task, session, user, apis):
         for i in range(0, len(extraFields)):
             default = defaults[i]['default']
             extraField = extraFields[i]
-            if config['cpdaily']['check'] and default['title'] != extraField['title']:
+            if config['cpdaily'][
+                    'check'] and default['title'] != extraField['title']:
                 log('第%d个默认配置项错误，请检查' % (i + 1))
                 exit(-1)
             extraFieldItems = extraField['extraFieldItems']
             for extraFieldItem in extraFieldItems:
                 if extraFieldItem['content'] == default['value']:
-                    extraFieldItemValue = {'extraFieldItemValue': default['value'],
-                                           'extraFieldItemWid': extraFieldItem['wid']}
+                    extraFieldItemValue = {
+                        'extraFieldItemValue': default['value'],
+                        'extraFieldItemWid': extraFieldItem['wid']
+                    }
                     # 其他，额外文本
                     if extraFieldItem['isOtherItems'] == 1:
-                        extraFieldItemValue = {'extraFieldItemValue': default['other'],
-                                               'extraFieldItemWid': extraFieldItem['wid']}
+                        extraFieldItemValue = {
+                            'extraFieldItemValue': default['other'],
+                            'extraFieldItemWid': extraFieldItem['wid']
+                        }
                     extraFieldItemValues.append(extraFieldItemValue)
         # log(extraFieldItemValues)
         # 处理带附加选项的签到
@@ -221,13 +248,18 @@ def fillForm(task, session, user, apis):
     form['isMalposition'] = task['isMalposition']
     form['abnormalReason'] = user['abnormalReason']
     form['position'] = user['address']
+    form['uaIsCpadaily'] = True
     return form
 
 
 # 上传图片到阿里云oss
 def uploadPicture(session, image, apis):
-    url = 'https://{host}/wec-counselor-sign-apps/stu/sign/getStsAccess'.format(host=apis['host'])
-    res = session.post(url=url, headers={'content-type': 'application/json'}, data=json.dumps({}), verify=not debug)
+    url = 'https://{host}/wec-counselor-sign-apps/stu/sign/getStsAccess'.format(
+        host=apis['host'])
+    res = session.post(url=url,
+                       headers={'content-type': 'application/json'},
+                       data=json.dumps({}),
+                       verify=not debug)
     datas = res.json().get('datas')
     fileName = datas.get('fileName')
     accessKeyId = datas.get('accessKeyId')
@@ -235,10 +267,14 @@ def uploadPicture(session, image, apis):
     securityToken = datas.get('securityToken')
     endPoint = datas.get('endPoint')
     bucket = datas.get('bucket')
-    bucket = oss2.Bucket(oss2.Auth(access_key_id=accessKeyId, access_key_secret=accessSecret), endPoint, bucket)
+    bucket = oss2.Bucket(
+        oss2.Auth(access_key_id=accessKeyId, access_key_secret=accessSecret),
+        endPoint, bucket)
     with open(image, "rb") as f:
         data = f.read()
-    bucket.put_object(key=fileName, headers={'x-oss-security-token': securityToken}, data=data)
+    bucket.put_object(key=fileName,
+                      headers={'x-oss-security-token': securityToken},
+                      data=data)
     res = bucket.sign_url('PUT', fileName, 60)
     # log(res)
     return fileName
@@ -246,17 +282,19 @@ def uploadPicture(session, image, apis):
 
 # 获取图片上传位置
 def getPictureUrl(session, fileName, apis):
-    url = 'https://{host}/wec-counselor-sign-apps/stu/sign/previewAttachment'.format(host=apis['host'])
-    data = {
-        'ossKey': fileName
-    }
-    res = session.post(url=url, headers={'content-type': 'application/json'}, data=json.dumps(data), verify=not debug)
+    url = 'https://{host}/wec-counselor-sign-apps/stu/sign/previewAttachment'.format(
+        host=apis['host'])
+    data = {'ossKey': fileName}
+    res = session.post(url=url,
+                       headers={'content-type': 'application/json'},
+                       data=json.dumps(data),
+                       verify=not debug)
     photoUrl = res.json().get('datas')
     return photoUrl
 
 
 # DES加密
-def DESEncrypt(s, key='ST83=@XV'):
+def DESEncrypt(s, key='b3L26XNL'):
     key = key
     iv = b"\x01\x02\x03\x04\x05\x06\x07\x08"
     k = des(key, CBC, iv, pad=None, padmode=PAD_PKCS5)
@@ -281,7 +319,8 @@ def submitForm(session, user, form, apis):
 
     headers = {
         # 'tenantId': '1019318364515869',
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; OPPO R11 Plus Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 okhttp/3.12.4',
+        'User-Agent':
+        'Mozilla/5.0 (Linux; Android 4.4.4; OPPO R11 Plus Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 okhttp/3.12.4',
         'CpdailyStandAlone': '0',
         'extension': '1',
         'Cpdaily-Extension': DESEncrypt(json.dumps(extension)),
@@ -290,8 +329,12 @@ def submitForm(session, user, form, apis):
         # 'Host': 'swu.cpdaily.com',
         'Connection': 'Keep-Alive'
     }
-    res = session.post(url='https://{host}/wec-counselor-sign-apps/stu/sign/submitSign'.format(host=apis['host']),
-                       headers=headers, data=json.dumps(form), verify=not debug)
+    res = session.post(
+        url='https://{host}/wec-counselor-sign-apps/stu/sign/submitSign'.
+        format(host=apis['host']),
+        headers=headers,
+        data=json.dumps(form),
+        verify=not debug)
     message = res.json()['message']
     if message == 'SUCCESS':
         log('自动签到成功')
@@ -305,23 +348,25 @@ def submitForm(session, user, form, apis):
 # 发送通知
 def sendMessage(msg, server_key):
     send = server_key
-    if msg.count("未开始")>0:
+    if msg.count("未开始") > 0:
         return ''
     try:
         if send != '':
-                log('正在发送通知。。。')
-                log(getTimeStr())
-                res = requests.post(url='https://sc.ftqq.com/'+ send +'.send',
-                                    data={'text': '今日校园自动签到结果通知' + getTimeStr(), 'desp': msg})
-                code = res.status_code
-                if code == 200:
-                    log('发送通知成功。。。')
-                else:
-                    log('发送通知失败。。。')
-                log(res.json())
+            log('正在发送通知。。。')
+            log(getTimeStr())
+            res = requests.post(url='https://sc.ftqq.com/' + send + '.send',
+                                data={
+                                    'text': '今日校园自动签到结果通知' + getTimeStr(),
+                                    'desp': msg
+                                })
+            code = res.status_code
+            if code == 200:
+                log('发送通知成功。。。')
+            else:
+                log('发送通知失败。。。')
+            log(res.json())
     except Exception as e:
         log("send failed")
-
 
 
 # 主函数
