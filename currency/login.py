@@ -28,7 +28,9 @@ def log(content):
 # 获取今日校园api
 def getCpdailyApis(user, debug=False):
     apis = {}
-    schools = requests.get(url='https://www.cpdaily.com/v6/config/guest/tenant/list', verify=not debug).json()['data']
+    schools = requests.get(
+        url='https://www.cpdaily.com/v6/config/guest/tenant/list',
+        verify=not debug).json()['data']
     flag = True
     for one in schools:
         if one['name'] == user['school']:
@@ -36,12 +38,12 @@ def getCpdailyApis(user, debug=False):
                 log(user['school'] + ' 未加入今日校园')
                 exit(-1)
             flag = False
-            params = {
-                'ids': one['id']
-            }
+            params = {'ids': one['id']}
             apis['tenantId'] = one['id']
-            res = requests.get(url='https://www.cpdaily.com/v6/config/guest/tenant/info', params=params,
-                               verify=not debug)
+            res = requests.get(
+                url='https://www.cpdaily.com/v6/config/guest/tenant/info',
+                params=params,
+                verify=not debug)
             data = res.json()['data'][0]
             joinType = data['joinType']
             idsUrl = data['idsUrl']
@@ -126,7 +128,8 @@ def getMessageCode():
         'SessionToken': 'szFn6zAbjjU=',
         'clientType': 'cpdaily_student',
         'tenantId': apis['tenantId'],
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 okhttp/3.8.1',
+        'User-Agent':
+        'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 okhttp/3.8.1',
         'deviceType': '1',
         'CpdailyStandAlone': '0',
         'CpdailyInfo': CpdailyInfo,
@@ -137,9 +140,7 @@ def getMessageCode():
         'Connection': 'Keep-Alive',
         'Accept-Encoding': 'gzip',
     }
-    params = {
-        'mobile': DESEncrypt(str(user['tellphone']))
-    }
+    params = {'mobile': DESEncrypt(str(user['tellphone']))}
     url = 'https://www.cpdaily.com/v6/auth/authentication/mobile/messageCode'
     res = session.post(url=url, headers=headers, data=json.dumps(params))
     errMsg = res.json()['errMsg']
@@ -156,7 +157,8 @@ def mobileLogin(code):
         'SessionToken': 'szFn6zAbjjU=',
         'clientType': 'cpdaily_student',
         'tenantId': apis['tenantId'],
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 okhttp/3.8.1',
+        'User-Agent':
+        'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 okhttp/3.8.1',
         'deviceType': '1',
         'CpdailyStandAlone': '0',
         'CpdailyInfo': CpdailyInfo,
@@ -167,10 +169,7 @@ def mobileLogin(code):
         'Connection': 'Keep-Alive',
         'Accept-Encoding': 'gzip',
     }
-    params = {
-        'loginToken': str(code),
-        'loginId': str(user['tellphone'])
-    }
+    params = {'loginToken': str(code), 'loginId': str(user['tellphone'])}
     url = 'https://www.cpdaily.com/v6/auth/authentication/mobileLogin'
     res = session.post(url=url, headers=headers, data=json.dumps(params))
     errMsg = res.json()['errMsg']
@@ -190,7 +189,8 @@ def validation(data):
         'SessionToken': DESEncrypt(sessionToken),
         'clientType': 'cpdaily_student',
         'tenantId': apis['tenantId'],
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 okhttp/3.8.1',
+        'User-Agent':
+        'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 okhttp/3.8.1',
         'deviceType': '1',
         'CpdailyStandAlone': '0',
         'CpdailyInfo': CpdailyInfo,
@@ -202,9 +202,7 @@ def validation(data):
         'Accept-Encoding': 'gzip',
         'Cookie': 'sessionToken=' + sessionToken
     }
-    params = {
-        'tgc': DESEncrypt(tgc)
-    }
+    params = {'tgc': DESEncrypt(tgc)}
     url = 'https://www.cpdaily.com/v6/auth/authentication/validation'
     res = session.post(url=url, headers=headers, data=json.dumps(params))
     errMsg = res.json()['errMsg']
@@ -236,7 +234,8 @@ def updateACwTc(data):
         'SessionToken': DESEncrypt(sessionToken),
         'clientType': 'cpdaily_student',
         'tenantId': apis['tenantId'],
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 okhttp/3.8.1',
+        'User-Agent':
+        'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 okhttp/3.8.1',
         'deviceType': '1',
         'CpdailyStandAlone': '0',
         'CpdailyInfo': CpdailyInfo,
@@ -246,7 +245,8 @@ def updateACwTc(data):
         'Connection': 'Keep-Alive',
         'Accept-Encoding': 'gzip'
     }
-    url = 'https://{host}/wec-portal-mobile/client/userStoreAppList'.format(host=host)
+    url = 'https://{host}/wec-portal-mobile/client/userStoreAppList'.format(
+        host=host)
     # 清除cookies
     # session.cookies.clear()
     session.get(url=url, headers=headers, allow_redirects=False)
@@ -260,24 +260,33 @@ def getModAuthCas(data):
     headers = {
         'Host': host,
         'Connection': 'keep-alive',
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 cpdaily/8.0.8 wisedu/8.0.8',
+        'User-Agent':
+        'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 cpdaily/8.0.8 wisedu/8.0.8',
         'Accept-Encoding': 'gzip,deflate',
         'Accept-Language': 'zh-CN,en-US;q=0.8',
         'X-Requested-With': 'com.wisedu.cpdaily'
     }
-    url = 'https://{host}/wec-counselor-sign-apps/stu/mobile/index.html?timestamp='.format(host=host) + str(
-        int(round(time.time() * 1000)))
+    url = 'https://{host}/wec-counselor-sign-apps/stu/mobile/index.html?timestamp='.format(
+        host=host) + str(int(round(time.time() * 1000)))
     res = session.get(url=url, headers=headers, allow_redirects=False)
     location = res.headers['location']
     # print(location)
     headers2 = {
-        'Host': 'www.cpdaily.com',
-        'Connection': 'keep-alive',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 cpdaily/8.0.8 wisedu/8.0.8',
-        'Accept-Encoding': 'gzip,deflate',
-        'Accept-Language': 'zh-CN,en-US;q=0.8',
-        'Cookie': 'clientType=cpdaily_student; tenantId=' + apis['tenantId'] + '; sessionToken=' + sessionToken,
+        'Host':
+        'www.cpdaily.com',
+        'Connection':
+        'keep-alive',
+        'Accept':
+        'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'User-Agent':
+        'Mozilla/5.0 (Linux; Android 4.4.4; PCRT00 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 cpdaily/8.0.8 wisedu/8.0.8',
+        'Accept-Encoding':
+        'gzip,deflate',
+        'Accept-Language':
+        'zh-CN,en-US;q=0.8',
+        'Cookie':
+        'clientType=cpdaily_student; tenantId=' + apis['tenantId'] +
+        '; sessionToken=' + sessionToken,
     }
     res = session.get(url=location, headers=headers2, allow_redirects=False)
     location = res.headers['location']
